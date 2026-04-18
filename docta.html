@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DOCTA — Documentation Test Analyser</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+:root{
+  --bg:#0e0e0e;--bg2:#161616;--bg3:#1e1e1e;
+  --border:#2a2a2a;--border2:#363636;
+  --text:#e8e8e8;--text2:#888;--text3:#555;
+  --accent:#39ff7a;--accent2:#1a7a3a;
+  --warn:#ffb347;--err:#ff5555;--info:#5599ff;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;min-height:100vh;line-height:1.6;}
+#app{display:grid;grid-template-columns:200px 1fr;grid-template-rows:40px 1fr;min-height:100vh;}
+#header{grid-column:1/-1;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;background:var(--bg2);}
+#header .logo{font-size:13px;font-weight:500;color:var(--accent);letter-spacing:.08em;}
+#header .sep{color:var(--text3);}
+#header .sub{font-size:11px;color:var(--text3);}
+#header .hright{margin-left:auto;display:flex;align-items:center;gap:10px;}
+#header .lang-btn{font-family:var(--mono);font-size:11px;padding:2px 10px;border:1px solid var(--border2);background:transparent;color:var(--text2);border-radius:2px;cursor:pointer;transition:all .1s;}
+#header .lang-btn.active{border-color:var(--accent2);color:var(--accent);}
+#header .lang-btn:hover{border-color:var(--border2);color:var(--text);}
+#header .ollama-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0;}
+#header .ollama-txt{font-size:11px;color:var(--text3);}
+#sidebar{border-right:1px solid var(--border);background:var(--bg2);padding:12px 0;display:flex;flex-direction:column;gap:2px;}
+.nav-sec{font-size:10px;color:var(--text3);letter-spacing:.1em;padding:8px 14px 4px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;color:var(--text2);font-size:12px;border-left:2px solid transparent;transition:all .1s;user-select:none;}
+.nav-item:hover{color:var(--text);background:var(--bg3);}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--bg3);}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;}
+.nav-item.active .nav-dot{background:var(--accent);}
+#main{overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px;}
+.panel{display:none;flex-direction:column;gap:14px;}
+.panel.active{display:flex;}
+.section-head{font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:2px;}
+.field{display:flex;flex-direction:column;}
+.field-label{font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;}
+textarea,input[type=text],select{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;border-radius:3px;resize:vertical;outline:none;transition:border-color .1s;}
+textarea:focus,input:focus,select:focus{border-color:var(--border2);}
+select{cursor:pointer;height:32px;resize:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+.row{display:flex;gap:12px;}
+.row>.field{flex:1;}
+.btn{font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:3px;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all .1s;align-self:flex-start;}
+.btn:hover{border-color:var(--accent2);color:var(--accent);}
+.btn.primary{border-color:var(--accent2);color:var(--accent);}
+.btn.primary:hover{background:var(--accent2);color:#fff;}
+.btn.small{font-size:11px;padding:4px 10px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+/* Drop zone */
+.drop-zone{border:1px dashed var(--border2);border-radius:3px;padding:20px;text-align:center;cursor:pointer;transition:all .15s;color:var(--text3);font-size:12px;}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--accent2);color:var(--accent);background:rgba(57,255,122,.03);}
+.drop-zone input{display:none;}
+/* Input tabs */
+.input-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:4px;}
+.input-tab{font-size:11px;padding:5px 12px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .1s;}
+.input-tab:hover{color:var(--text);}
+.input-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.input-panel{display:none;}
+.input-panel.active{display:flex;flex-direction:column;gap:8px;}
+/* Status bar */
+.status-bar{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:3px;border:1px solid var(--border);background:var(--bg3);font-size:11px;}
+/* Progress */
+.progress-wrap{display:none;flex-direction:column;gap:5px;}
+.progress-track{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;border:1px solid var(--border);}
+.progress-fill{height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .3s ease;}
+/* Output */
+.output-box{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:12px 14px;font-size:12px;line-height:1.85;min-height:80px;white-space:pre-wrap;word-break:break-word;max-height:600px;overflow-y:auto;font-family:var(--sans);}
+.output-box .out-section{color:var(--accent);font-weight:500;font-family:var(--mono);font-size:11px;letter-spacing:.08em;}
+.output-box .out-req{color:var(--info);}
+.output-box .out-tc-happy{color:var(--accent);}
+.output-box .out-tc-neg{color:var(--err);}
+.output-box .out-tc-bound{color:var(--warn);}
+.output-box .out-ambig{color:var(--warn);}
+.output-box .out-question{color:var(--info);}
+/* History */
+.hist-item{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:10px 12px;cursor:pointer;transition:border-color .1s;}
+.hist-item:hover{border-color:var(--border2);}
+.hist-title{font-size:12px;color:var(--text);font-weight:500;margin-bottom:3px;}
+.hist-meta{font-size:10px;color:var(--text3);}
+/* Settings */
+.setting-row{display:flex;flex-direction:column;gap:5px;}
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+/* Checkbox labels */
+.cb-label{font-size:12px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:6px;}
+.cb-label input{accent-color:var(--accent);}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="header">
+  <span class="logo">DOCTA</span>
+  <span class="sep">/</span>
+  <span class="sub">Documentation Test Analyser</span>
+  <div class="hright">
+    <div class="ollama-dot" id="hdr-dot"></div>
+    <span class="ollama-txt" id="hdr-status">Checking Ollama...</span>
+    <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="btn-pl" onclick="setLang('pl')">PL</button>
+  </div>
+</div>
+
+<div id="sidebar">
+  <div class="nav-sec" data-i="nav.tools">Tools</div>
+  <div class="nav-item active" onclick="nav('analyser')"><div class="nav-dot"></div><span data-i="nav.analyser">Analyser</span></div>
+  <div class="nav-item" onclick="nav('history')"><div class="nav-dot"></div><span data-i="nav.history">History</span></div>
+  <div class="nav-sec" style="margin-top:8px;" data-i="nav.tools2">Tools</div>
+  <div class="nav-item" onclick="nav('batch')"><div class="nav-dot"></div><span data-i="nav.batch">Batch analyser</span></div>
+  <div class="nav-sec" style="margin-top:8px;" data-i="nav.config">Config</div>
+  <div class="nav-item" onclick="nav('settings')"><div class="nav-dot"></div><span data-i="nav.settings">Settings</span></div>
+  <div class="nav-item" onclick="nav('about')"><div class="nav-dot"></div><span data-i="nav.about">About</span></div>
+</div>
+
+<div id="main">
+
+  <!-- ANALYSER -->
+  <div class="panel active" id="panel-analyser">
+    <div class="section-head" data-i="analyser.head">Analyser</div>
+
+    <!-- Ollama status -->
+    <div class="status-bar">
+      <div class="ollama-dot" id="an-dot"></div>
+      <span id="an-status" style="flex:1;" data-i="status.checking">Checking Ollama...</span>
+      <select id="an-model" style="height:26px;font-size:11px;padding:0 24px 0 8px;min-width:175px;border-radius:2px;">
+        <option value="qwen2.5:7b">qwen2.5:7b (recommended)</option>
+        <option value="mistral:7b">mistral:7b</option>
+        <option value="llama3.1:8b">llama3.1:8b</option>
+        <option value="llama3.2:3b">llama3.2:3b (fastest)</option>
+        <option value="deepseek-r1:7b">deepseek-r1:7b</option>
+        <option value="phi3:mini">phi3:mini (lightest)</option>
+      </select>
+      <button class="btn small" onclick="checkOllama()" data-i="btn.check">check</button>
+    </div>
+
+    <!-- Setup instructions -->
+    <details>
+      <summary style="font-size:11px;color:var(--text3);cursor:pointer;padding:2px 0;" data-i="setup.title">Setup instructions (one-time)</summary>
+      <div style="padding:8px 0 0;">
+        <div style="background:#0a0a0a;border:1px solid var(--border);border-radius:3px;padding:10px 12px;font-size:11px;color:#4ec994;white-space:pre-wrap;font-family:var(--mono);" id="setup-text">1. Install Ollama:  https://ollama.com/download
+
+2. Start with CORS enabled:
+   Windows:   set OLLAMA_ORIGINS=* &amp;&amp; ollama serve
+   Mac/Linux: OLLAMA_ORIGINS="*" ollama serve
+
+3. Pull a model (first time):
+   ollama pull qwen2.5:7b
+
+4. Click "check" above — dot turns green.</div>
+      </div>
+    </details>
+
+    <!-- Input tabs -->
+    <div>
+      <div class="input-tabs">
+        <div class="input-tab active" onclick="switchInput('text')" data-i="input.paste">Paste text</div>
+        <div class="input-tab" onclick="switchInput('file')" data-i="input.file">Upload file</div>
+        <div class="input-tab" onclick="switchInput('image')" data-i="input.image">Image / screenshot</div>
+      </div>
+
+      <div class="input-panel active" id="inp-text">
+        <textarea id="an-text" rows="9" style="font-family:var(--sans);font-size:12px;" data-placeholder-en="Paste any documentation: functional specification, user story, API description, meeting notes, Word content..." data-placeholder-pl="Wklej dowolną dokumentację: specyfikację funkcjonalną, user story, opis API, notatki ze spotkania..."></textarea>
+        <div id="an-text-meta" style="font-size:10px;color:var(--text3);"></div>
+      </div>
+
+      <div class="input-panel" id="inp-file">
+        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+          <input type="file" id="file-input" accept=".txt,.pdf,.docx" onchange="handleFile(this.files[0])">
+          <div id="drop-label" data-i="drop.label">Drop .txt / .pdf / .docx here or click to browse</div>
+          <div id="drop-meta" style="font-size:11px;color:var(--text3);margin-top:4px;"></div>
+        </div>
+      </div>
+
+      <div class="input-panel" id="inp-image">
+        <div class="drop-zone" id="img-drop-zone" onclick="document.getElementById('img-file-input').click()">
+          <input type="file" id="img-file-input" accept="image/*" onchange="handleImage(this.files[0])">
+          <div id="img-drop-label" data-i="img.drop">Drop image here or click to browse</div>
+          <div id="img-drop-meta" style="font-size:11px;color:var(--text3);margin-top:4px;"></div>
+        </div>
+        <div id="img-preview-wrap" style="display:none;margin-top:6px;">
+          <img id="img-preview" style="max-width:100%;max-height:220px;border-radius:3px;border:1px solid var(--border);object-fit:contain;" alt="preview">
+        </div>
+        <div id="img-model-warn" style="display:none;padding:6px 10px;border-radius:3px;border:1px solid rgba(255,179,71,.3);background:rgba(255,179,71,.06);font-size:11px;color:var(--warn);margin-top:4px;"></div>
+        <div style="margin-top:6px;">
+          <div class="field-label" data-i="img.visionModel">Vision model</div>
+          <select id="img-model" style="height:32px;margin-top:4px;">
+            <option value="llava:7b">llava:7b (recommended, ~5 GB)</option>
+            <option value="llava-phi3:3.8b">llava-phi3:3.8b (~3 GB)</option>
+            <option value="moondream:1.8b">moondream:1.8b (~1 GB, lightest)</option>
+            <option value="llava:13b">llava:13b (~8 GB, best quality)</option>
+          </select>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px;" data-i="img.pullHint">Pull first: ollama pull llava:7b</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="row" style="flex-wrap:wrap;gap:14px;">
+      <div class="field" style="min-width:220px;">
+        <div class="field-label" data-i="opts.generate">Generate</div>
+        <div style="display:flex;flex-direction:column;gap:6px;padding-top:2px;">
+          <label class="cb-label"><input type="checkbox" id="opt-req" checked> <span data-i="opt.req">Functional requirements</span></label>
+          <label class="cb-label"><input type="checkbox" id="opt-tc" checked> <span data-i="opt.tc">Test cases</span></label>
+          <label class="cb-label"><input type="checkbox" id="opt-ambig" checked> <span data-i="opt.ambig">Ambiguities &amp; gaps</span></label>
+          <label class="cb-label"><input type="checkbox" id="opt-questions"> <span data-i="opt.questions">Questions for dev/analyst</span></label>
+          <label class="cb-label"><input type="checkbox" id="opt-matrix"> <span data-i="opt.matrix">Coverage matrix</span></label>
+        </div>
+      </div>
+      <div class="field" style="min-width:140px;">
+        <div class="field-label" data-i="opts.output">Output language</div>
+        <select id="opt-lang" style="margin-top:2px;">
+          <option value="en">English</option>
+          <option value="pl">Polski</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="prog-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span id="prog-label" style="font-size:11px;color:var(--text3);">Analysing...</span>
+        <span id="prog-pct" style="font-size:12px;font-weight:500;color:var(--accent);font-family:var(--mono);">0%</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+      <div id="prog-detail" style="font-size:10px;color:var(--text3);font-family:var(--mono);"></div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-row">
+      <button class="btn primary" id="run-btn" onclick="runAnalysis()" data-i="btn.analyse">Analyse</button>
+      <button class="btn small" id="stop-btn" onclick="stopAnalysis()" style="display:none;" data-i="btn.stop">stop</button>
+      <button class="btn small" onclick="clearAll()" data-i="btn.clear">clear</button>
+      <div id="export-btns" style="display:none;display:flex;gap:6px;flex-wrap:wrap;margin-left:4px;">
+        <button class="btn small" onclick="exportTxt()" data-i="btn.txt">↓ .txt</button>
+        <button class="btn small" onclick="exportMd()" data-i="btn.md">↓ .md</button>
+        <button class="btn small" onclick="exportDocx()" data-i="btn.docx">↓ .docx</button>
+        <button class="btn small" onclick="exportXlsx()" data-i="btn.xlsx">↓ .xlsx</button>
+        <button class="btn small" onclick="copyResult()" data-i="btn.copy">copy</button>
+      </div>
+    </div>
+
+    <!-- Output -->
+    <div id="out-wrap" style="display:none;flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="field-label" style="margin:0;" data-i="out.result">Analysis result</div>
+        <div id="out-stats" style="font-size:11px;color:var(--text3);margin-left:auto;"></div>
+      </div>
+      <div class="output-box" id="out-box"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="panel" id="panel-history">
+    <div class="section-head" data-i="history.head">Session history</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <div id="hist-count" style="font-size:11px;color:var(--text3);"></div>
+      <div style="margin-left:auto;display:flex;gap:6px;">
+        <button class="btn small" onclick="exportHistoryXlsx()" data-i="btn.exportHist">&#8595; export .xlsx</button>
+        <button class="btn small" onclick="clearHistory()" data-i="btn.clearHist">clear</button>
+      </div>
+    </div>
+    <div id="hist-list" style="display:flex;flex-direction:column;gap:6px;">
+      <div style="font-size:12px;color:var(--text3);" data-i="history.empty">No analyses yet this session.</div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="panel" id="panel-settings">
+    <div class="section-head" data-i="settings.head">Settings</div>
+    <div class="setting-row">
+      <div class="field-label" data-i="settings.ollamaUrl">Ollama URL</div>
+      <input type="text" id="set-url" value="http://localhost:11434" style="height:32px;">
+    </div>
+    <div class="setting-row">
+      <div class="field-label" data-i="settings.defaultModel">Default model</div>
+      <select id="set-model">
+        <option value="qwen2.5:7b">qwen2.5:7b (recommended)</option>
+        <option value="mistral:7b">mistral:7b</option>
+        <option value="llama3.1:8b">llama3.1:8b</option>
+        <option value="llama3.2:3b">llama3.2:3b (fastest)</option>
+        <option value="deepseek-r1:7b">deepseek-r1:7b</option>
+        <option value="phi3:mini">phi3:mini (lightest)</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="saveSettings()" data-i="btn.save">Save</button>
+      <button class="btn small" onclick="resetSettings()" data-i="btn.reset">reset to defaults</button>
+    </div>
+    <div id="set-msg" style="font-size:11px;color:var(--accent);display:none;"></div>
+
+    <div class="section-head" style="margin-top:12px;" data-i="settings.templates">Prompt templates</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:6px;" data-i="settings.templatesHint">Select a built-in template or save your own.</div>
+    <div id="tmpl-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;"></div>
+    <div class="field" style="margin-bottom:6px;">
+      <div class="field-label" data-i="settings.tmplName">Template name</div>
+      <input type="text" id="tmpl-name" placeholder="My custom template" style="height:32px;">
+    </div>
+    <div class="field" style="margin-bottom:6px;">
+      <div class="field-label" data-i="settings.tmplContent">Additional instructions</div>
+      <textarea id="tmpl-content" rows="3" style="font-family:var(--sans);font-size:12px;" placeholder="e.g. Focus on GDPR compliance."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn small" onclick="saveTmpl()" data-i="btn.saveTmpl">save template</button>
+      <button class="btn small" onclick="clearTmpl()" data-i="btn.clearTmpl">clear</button>
+    </div>
+  </div>
+
+  <!-- BATCH -->
+  <div class="panel" id="panel-batch">
+    <div class="section-head" data-i="batch.head">Batch analyser</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px;" data-i="batch.hint">Upload multiple files. Each analysed separately.</div>
+    <div class="drop-zone" id="batch-drop" onclick="document.getElementById('batch-input').click()">
+      <input type="file" id="batch-input" accept=".txt,.pdf,.docx" multiple onchange="batchAddFiles(this.files)">
+      <div data-i="batch.drop">Drop .txt / .pdf / .docx files here or click</div>
+    </div>
+    <div id="batch-file-list" style="display:flex;flex-direction:column;gap:4px;margin-top:6px;"></div>
+    <div class="row" style="margin-top:8px;flex-wrap:wrap;gap:12px;">
+      <div class="field" style="min-width:180px;">
+        <div class="field-label" data-i="opts.generate">Generate</div>
+        <div style="display:flex;flex-direction:column;gap:4px;padding-top:2px;">
+          <label class="cb-label"><input type="checkbox" id="b-opt-req" checked> <span data-i="opt.req">Functional requirements</span></label>
+          <label class="cb-label"><input type="checkbox" id="b-opt-tc" checked> <span data-i="opt.tc">Test cases</span></label>
+          <label class="cb-label"><input type="checkbox" id="b-opt-ambig" checked> <span data-i="opt.ambig">Ambiguities &amp; gaps</span></label>
+        </div>
+      </div>
+      <div class="field" style="min-width:120px;">
+        <div class="field-label" data-i="opts.output">Output language</div>
+        <select id="b-opt-lang" style="height:32px;margin-top:2px;"><option value="en">English</option><option value="pl">Polski</option></select>
+      </div>
+    </div>
+    <div id="batch-progress-wrap" style="display:none;flex-direction:column;gap:5px;">
+      <div style="display:flex;justify-content:space-between;">
+        <span id="batch-prog-label" style="font-size:11px;color:var(--text3);"></span>
+        <span id="batch-prog-pct" style="font-size:12px;color:var(--accent);font-family:var(--mono);font-weight:500;"></span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="batch-prog-fill"></div></div>
+      <div id="batch-prog-detail" style="font-size:10px;color:var(--text3);font-family:var(--mono);"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" id="batch-run-btn" onclick="batchRun()" data-i="btn.batchRun">Analyse all</button>
+      <button class="btn small" id="batch-stop-btn" onclick="batchStop()" style="display:none;" data-i="btn.stop">stop</button>
+      <button class="btn small" onclick="batchClear()" data-i="btn.clear">clear</button>
+      <button class="btn small" id="batch-export-btn" onclick="batchExport()" style="display:none;" data-i="btn.xlsx">&#8595; export .xlsx</button>
+    </div>
+    <div id="batch-results" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;"></div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="panel" id="panel-about">
+    <div class="section-head" data-i="about.head">About</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:14px 16px;">
+      <div style="font-size:12px;font-weight:500;color:var(--accent);margin-bottom:8px;">DOCTA — Documentation Test Analyser v1.0</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8;white-space:pre-wrap;" data-i="about.body">Author: Radoslaw Wojciechowski
+
+Single HTML file. No server. No cloud. No telemetry.
+All processing happens locally via Ollama.
+Your documents never leave your machine.
+
+──────────────────────────────
+Supported input:
+  · Plain text (paste or .txt)
+  · PDF documents (.pdf)
+  · Word documents (.docx)
+
+Output:
+  · Functional requirements (R-01, R-02...)
+  · Test cases (TC-001 with categories)
+  · Ambiguities and gaps
+  · Questions for dev/analyst
+  · Coverage matrix
+
+Export: .txt / .md / .docx / .xlsx
+
+──────────────────────────────
+Stack: vanilla HTML/CSS/JS
+PDF: PDF.js  |  DOCX read: mammoth.js
+No build step. Open in any browser.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── i18n ────────────────────────────────────────────────────────
+var LANG = 'en';
+var i18n = {
+  en: {
+    'nav.tools':'Tools','nav.analyser':'Analyser','nav.history':'History',
+    'nav.config':'Config','nav.settings':'Settings','nav.about':'About',
+    'analyser.head':'Analyser','status.checking':'Checking Ollama...',
+    'btn.check':'check','setup.title':'Setup instructions (one-time)',
+    'input.paste':'Paste text','input.file':'Upload file',
+    'drop.label':'Drop .txt / .pdf / .docx here or click to browse',
+    'opts.generate':'Generate','opt.req':'Functional requirements',
+    'opt.tc':'Test cases','opt.ambig':'Ambiguities & gaps',
+    'opt.questions':'Questions for dev/analyst','opt.matrix':'Coverage matrix',
+    'opts.output':'Output language',
+    'btn.analyse':'Analyse','btn.stop':'stop','btn.clear':'clear',
+    'btn.txt':'↓ .txt','btn.md':'↓ .md','btn.docx':'↓ .docx',
+    'btn.xlsx':'↓ .xlsx','btn.copy':'copy',
+    'out.result':'Analysis result',
+    'history.head':'Session history','history.empty':'No analyses yet this session.',
+    'btn.clearHist':'clear history',
+    'settings.head':'Settings','settings.ollamaUrl':'Ollama URL',
+    'settings.defaultModel':'Default model','btn.save':'Save','btn.reset':'reset to defaults',
+    'about.head':'About',
+    'about.body':'Author: Radoslaw Wojciechowski\n\nSingle HTML file. No server. No cloud. No telemetry.\nAll processing happens locally via Ollama.\nYour documents never leave your machine.\n\n──────────────────────────────\nSupported input:\n  · Plain text (paste or .txt)\n  · PDF documents (.pdf)\n  · Word documents (.docx)\n\nOutput:\n  · Functional requirements (R-01, R-02...)\n  · Test cases (TC-001 with categories)\n  · Ambiguities and gaps\n  · Questions for dev/analyst\n  · Coverage matrix\n\nExport: .txt / .md / .docx / .xlsx\n\n──────────────────────────────\nStack: vanilla HTML/CSS/JS\nPDF: PDF.js  |  DOCX read: mammoth.js\nNo build step. Open in any browser.',
+    'prog.loading':'Loading model...','prog.analysing':'Analysing documentation...',
+    'prog.generating':'Generating test cases...','prog.finalising':'Finalising output...',
+    'prog.done':'Done',
+    'status.running':'Ollama running','status.notfound':'Ollama not reachable — see setup instructions',
+    'status.models':'model','status.models_pl':'models',
+  },
+  pl: {
+    'nav.tools':'Narzędzia','nav.analyser':'Analizator','nav.history':'Historia',
+    'nav.config':'Konfiguracja','nav.settings':'Ustawienia','nav.about':'O programie',
+    'analyser.head':'Analizator','status.checking':'Sprawdzanie Ollama...',
+    'btn.check':'sprawdź','setup.title':'Instrukcja konfiguracji (jednorazowo)',
+    'input.paste':'Wklej tekst','input.file':'Wgraj plik',
+    'drop.label':'Upuść plik .txt / .pdf / .docx tutaj lub kliknij',
+    'opts.generate':'Generuj','opt.req':'Wymagania funkcjonalne',
+    'opt.tc':'Przypadki testowe','opt.ambig':'Niejednoznaczności i luki',
+    'opt.questions':'Pytania do dewelopera/analityka','opt.matrix':'Macierz pokrycia',
+    'opts.output':'Język wyniku',
+    'btn.analyse':'Analizuj','btn.stop':'zatrzymaj','btn.clear':'wyczyść',
+    'btn.txt':'↓ .txt','btn.md':'↓ .md','btn.docx':'↓ .docx',
+    'btn.xlsx':'↓ .xlsx','btn.copy':'kopiuj',
+    'out.result':'Wynik analizy',
+    'history.head':'Historia sesji','history.empty':'Brak analiz w tej sesji.',
+    'btn.clearHist':'wyczyść historię',
+    'settings.head':'Ustawienia','settings.ollamaUrl':'URL Ollama',
+    'settings.defaultModel':'Domyślny model','btn.save':'Zapisz','btn.reset':'przywróć domyślne',
+    'about.head':'O programie',
+    'about.body':'Autor: Radosław Wojciechowski\n\nJeden plik HTML. Bez serwera. Bez chmury. Bez telemetrii.\nCałe przetwarzanie odbywa się lokalnie przez Ollama.\nTwoje dokumenty nie opuszczają komputera.\n\n──────────────────────────────\nObsługiwane formaty wejściowe:\n  · Zwykły tekst (wklejony lub .txt)\n  · Dokumenty PDF (.pdf)\n  · Dokumenty Word (.docx)\n\nWyjście:\n  · Wymagania funkcjonalne (R-01, R-02...)\n  · Przypadki testowe (TC-001 z kategoriami)\n  · Niejednoznaczności i luki\n  · Pytania do dewelopera/analityka\n  · Macierz pokrycia\n\nEksport: .txt / .md / .docx / .xlsx\n\n──────────────────────────────\nStack: vanilla HTML/CSS/JS\nPDF: PDF.js  |  DOCX odczyt: mammoth.js\nBez buildu. Otwórz w przeglądarce.',
+    'prog.loading':'Ładowanie modelu...','prog.analysing':'Analiza dokumentacji...',
+    'prog.generating':'Generowanie przypadków testowych...','prog.finalising':'Finalizacja wyniku...',
+    'prog.done':'Gotowe',
+    'status.running':'Ollama działa','status.notfound':'Ollama niedostępna — sprawdź instrukcję konfiguracji',
+    'status.models':'model','status.models_pl':'modele',
+  }
+};
+
+function t(key){ return (i18n[LANG]||i18n.en)[key] || key; }
+
+function setLang(lang) {
+  LANG = lang;
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  document.getElementById('btn-pl').classList.toggle('active', lang==='pl');
+  // Update all data-i elements
+  document.querySelectorAll('[data-i]').forEach(function(el){
+    var key = el.getAttribute('data-i');
+    el.textContent = t(key);
+  });
+  // Update placeholders
+  document.querySelectorAll('[data-placeholder-'+lang+']').forEach(function(el){
+    el.placeholder = el.getAttribute('data-placeholder-'+lang);
+  });
+  // Update opt-lang default
+  document.getElementById('opt-lang').value = lang;
+  // Re-check ollama status text
+  checkOllama();
+}
+
+// ── Navigation ──────────────────────────────────────────────────
+function nav(id) {
+  document.querySelectorAll('.nav-item').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(el){ el.classList.remove('active'); });
+  event.currentTarget.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+}
+
+function switchInput(mode) {
+  document.querySelectorAll('.input-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.input-panel').forEach(function(p){ p.classList.remove('active'); });
+  event.currentTarget.classList.add('active');
+  document.getElementById('inp-'+mode).classList.add('active');
+}
+
+// ── Ollama ───────────────────────────────────────────────────────
+var _ollamaOk = false;
+var _ollamaUrl = 'http://localhost:11434';
+
+function checkOllama() {
+  var url = document.getElementById('set-url') ? document.getElementById('set-url').value.trim() : _ollamaUrl;
+  _ollamaUrl = url;
+  setDot(false, t('status.checking'));
+  fetch(_ollamaUrl+'/api/tags',{method:'GET',signal:AbortSignal.timeout(3000)})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      _ollamaOk = true;
+      var models = (data.models||[]).map(function(m){ return m.name; });
+      var cnt = models.length;
+      var mword = LANG==='pl' ? (cnt===1?'model':'modele') : (cnt===1?'model':'models');
+      setDot(true, t('status.running')+' \u00b7 '+cnt+' '+mword+' available');
+      if (models.length>0) updateModelDropdowns(models);
+    })
+    .catch(function(){
+      _ollamaOk = false;
+      setDot(false, t('status.notfound'));
+    });
+}
+
+function setDot(ok, msg) {
+  var color = ok ? '#39ff7a' : '#ff5555';
+  ['an-dot','hdr-dot'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.style.background = color;
+  });
+  ['an-status','hdr-status'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el){ el.textContent = msg; el.style.color = color; }
+  });
+}
+
+function updateModelDropdowns(models) {
+  ['an-model','set-model'].forEach(function(selId){
+    var sel = document.getElementById(selId);
+    if(!sel) return;
+    for(var i=0;i<sel.options.length;i++){
+      var opt = sel.options[i];
+      var base = opt.value.split(':')[0];
+      var avail = models.some(function(m){ return m.startsWith(base); });
+      if(avail && !opt.text.includes('\u2713')) opt.text = opt.text+' \u2713';
+    }
+  });
+}
+
+// ── File handling ────────────────────────────────────────────────
+var _fileText = '';
+
+var dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', function(e){ e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', function(){ dropZone.classList.remove('dragover'); });
+dropZone.addEventListener('drop', function(e){
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+function handleFile(file) {
+  if(!file) return;
+  var ext = file.name.split('.').pop().toLowerCase();
+  var meta = document.getElementById('drop-meta');
+  var label = document.getElementById('drop-label');
+  label.textContent = 'Loading: '+file.name+'...';
+  meta.textContent = '';
+
+  if(ext==='txt'){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      _fileText = e.target.result;
+      label.textContent = file.name;
+      meta.textContent = _fileText.length.toLocaleString()+' chars \u00b7 '+countWords(_fileText)+' words';
+    };
+    reader.readAsText(file);
+  } else if(ext==='pdf'){
+    var fr = new FileReader();
+    fr.onload = function(e){
+      var typedArray = new Uint8Array(e.target.result);
+      if(typeof pdfjsLib === 'undefined'){ meta.textContent='PDF.js not loaded'; return; }
+      pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      pdfjsLib.getDocument(typedArray).promise.then(function(pdf){
+        var pages = [];
+        var total = pdf.numPages;
+        for(var i=1;i<=total;i++) pages.push(i);
+        return Promise.all(pages.map(function(n){ return pdf.getPage(n).then(function(p){ return p.getTextContent(); }); }));
+      }).then(function(contents){
+        _fileText = contents.map(function(c){ return c.items.map(function(i){ return i.str; }).join(' '); }).join('\n\n');
+        label.textContent = file.name;
+        meta.textContent = _fileText.length.toLocaleString()+' chars \u00b7 '+countWords(_fileText)+' words';
+      }).catch(function(e){ meta.textContent = 'PDF error: '+e.message; });
+    };
+    fr.readAsArrayBuffer(file);
+  } else if(ext==='docx'){
+    var fr2 = new FileReader();
+    fr2.onload = function(e){
+      if(typeof mammoth === 'undefined'){ meta.textContent='mammoth.js not loaded'; return; }
+      mammoth.extractRawText({arrayBuffer: e.target.result}).then(function(result){
+        _fileText = result.value;
+        label.textContent = file.name;
+        meta.textContent = _fileText.length.toLocaleString()+' chars \u00b7 '+countWords(_fileText)+' words';
+      }).catch(function(e){ meta.textContent = 'DOCX error: '+e.message; });
+    };
+    fr2.readAsArrayBuffer(file);
+  } else {
+    label.textContent = 'Unsupported file type: .'+ext;
+  }
+}
+
+function countWords(text){ return text.trim().split(/\s+/).filter(function(w){return w.length>0;}).length; }
+
+// ── Get input text ────────────────────────────────────────────────
+function getInputText() {
+  var activePanel = document.querySelector('.input-panel.active');
+  if(activePanel && activePanel.id==='inp-file') return _fileText;
+  if(activePanel && activePanel.id==='inp-image') return _imageExtractedText;
+  return document.getElementById('an-text').value.trim();
+}
+
+// ── Build prompt ─────────────────────────────────────────────────
+function buildPrompt(docText, opts, outLang) {
+  var isPL = outLang==='pl';
+  var sections = [];
+  if(opts.req) sections.push(isPL
+    ? 'WYMAGANIA FUNKCJONALNE:\nWypisz numerowana liste wymagan (R-01, R-02...). Kazde wymaganie to jedno zdanie.'
+    : 'FUNCTIONAL REQUIREMENTS:\nList numbered requirements (R-01, R-02...). One sentence each.');
+  if(opts.tc) sections.push(isPL
+    ? 'PRZYPADKI TESTOWE:\nFormat:\nTC-001 [HAPPY PATH] Nazwa\n  Warunek wstepny: ...\n  Wejscie: ...\n  Oczekiwany wynik: ...\n\nKategorie: HAPPY PATH, NEGATIVE, BOUNDARY.'
+    : 'TEST CASES:\nFormat:\nTC-001 [HAPPY PATH] Name\n  Precondition: ...\n  Input: ...\n  Expected result: ...\n\nCategories: HAPPY PATH, NEGATIVE, BOUNDARY.');
+  if(opts.ambig) sections.push(isPL
+    ? 'NIEJEDNOZNACZNOSCI I LUKI:\nFormat: ! Opis problemu'
+    : 'AMBIGUITIES AND GAPS:\nFormat: ! Description of issue');
+  if(opts.questions) sections.push(isPL
+    ? 'PYTANIA DO DEWELOPERA/ANALITYKA:\nFormat: ? Pytanie'
+    : 'QUESTIONS FOR DEV/ANALYST:\nFormat: ? Question');
+  if(opts.matrix) sections.push(isPL
+    ? 'MACIERZ POKRYCIA:\nTabela: Wymaganie | Pokrywajace TC | Uwagi'
+    : 'COVERAGE MATRIX:\nTable: Requirement | Covering TC | Notes');
+
+  var sectionList = sections.join('\n\n');
+  return isPL
+    ? 'Jestes doswiadczonym testerem oprogramowania. Przeanalizuj dokumentacje i wygeneruj ponizsze sekcje:\n\n'+sectionList+'\n\nDokumentacja:\n"""\n'+docText+'\n"""\n\nOdpowiedz TYLKO z zadanymi sekcjami, bez wstepu. Pisz po polsku.'
+    : 'You are an experienced software tester. Analyse the documentation and generate these sections:\n\n'+sectionList+'\n\nDocumentation:\n"""\n'+docText+'\n"""\n\nRespond ONLY with the requested sections, no introduction or meta-commentary.';
+}
+
+// ── Analysis ─────────────────────────────────────────────────────
+var _abort = null;
+var _resultText = '';
+var _resultRaw = '';
+
+function runAnalysis() {
+  var docText = getInputText();
+  if(!docText){ showErr(LANG==='pl'?'Wklej lub wgraj dokumentację.':'Paste or upload documentation first.'); return; }
+  if(!_ollamaOk){ showErr(LANG==='pl'?'Ollama nie działa. Sprawdź instrukcję.':'Ollama is not running. See setup instructions.'); return; }
+
+  var opts = {
+    req:      document.getElementById('opt-req').checked,
+    tc:       document.getElementById('opt-tc').checked,
+    ambig:    document.getElementById('opt-ambig').checked,
+    questions:document.getElementById('opt-questions').checked,
+    matrix:   document.getElementById('opt-matrix').checked,
+  };
+  if(!opts.req&&!opts.tc&&!opts.ambig&&!opts.questions&&!opts.matrix){
+    showErr(LANG==='pl'?'Zaznacz przynajmniej jedną opcję.':'Select at least one output option.'); return;
+  }
+
+  var outLang = document.getElementById('opt-lang').value;
+  var model   = document.getElementById('an-model').value;
+  var prompt  = buildPrompt(docText, opts, outLang);
+  var inputChars = docText.length;
+
+  _resultText = ''; _resultRaw = '';
+  _abort = new AbortController();
+
+  document.getElementById('run-btn').disabled = true;
+  document.getElementById('stop-btn').style.display = 'inline-block';
+  document.getElementById('export-btns').style.display = 'none';
+  document.getElementById('out-wrap').style.display = 'flex';
+  document.getElementById('out-wrap').style.flexDirection = 'column';
+  document.getElementById('out-box').innerHTML = '';
+  document.getElementById('out-stats').textContent = '';
+  setProgress(true, t('prog.loading'), 0, '');
+
+  var startTime = Date.now();
+  var tokenCount = 0;
+  var lastUpdate = 0;
+  var lastPct = 0;
+
+  fetch(_ollamaUrl+'/api/generate',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    signal:_abort.signal,
+    body:JSON.stringify({model:model,prompt:prompt,stream:true,options:{temperature:0.2,top_p:0.9}})
+  })
+  .then(function(response){
+    if(!response.ok) throw new Error('Ollama returned HTTP '+response.status);
+    var reader = response.body.getReader();
+    var decoder = new TextDecoder();
+    function read(){
+      return reader.read().then(function(result){
+        if(result.done){ finish(startTime,tokenCount,docText,model); return; }
+        var chunk = decoder.decode(result.value,{stream:true});
+        chunk.split('\n').forEach(function(line){
+          line=line.trim(); if(!line) return;
+          try{
+            var data = JSON.parse(line);
+            if(data.response){
+              _resultRaw += data.response;
+              tokenCount++;
+              renderOutput(_resultRaw);
+            }
+            if(data.done){ finish(startTime,tokenCount,docText,model); return; }
+          }catch(e){}
+        });
+        var now = Date.now();
+        if(now-lastUpdate>250){
+          lastUpdate=now;
+          var elapsed=(now-startTime)/1000;
+          var estTokens=Math.max(inputChars/3,150);
+          var pct=tokenCount<5?Math.min(9,tokenCount*2):Math.min(92,Math.round(10+(tokenCount/estTokens)*82));
+          if(pct<lastPct) pct=lastPct; lastPct=pct;
+          var speed=elapsed>0?(tokenCount/elapsed).toFixed(1):'0';
+          var stage=pct<10?t('prog.loading'):pct<35?t('prog.analysing'):pct<70?t('prog.generating'):t('prog.finalising');
+          setProgress(true,stage,pct,tokenCount+' tokens \u00b7 '+speed+' tok/s \u00b7 '+elapsed.toFixed(0)+'s');
+        }
+        return read();
+      });
+    }
+    return read();
+  })
+  .catch(function(e){
+    if(e.name==='AbortError'){
+      renderOutput(_resultRaw+'\n\n[stopped by user]');
+    } else {
+      showErr('Error: '+e.message+'\nIs Ollama running with OLLAMA_ORIGINS="*"?');
+    }
+    setProgress(false,'',0,'');
+    resetButtons();
+  });
+}
+
+function finish(startTime, tokenCount, docText, model) {
+  var elapsed=((Date.now()-startTime)/1000).toFixed(1);
+  var speed=(tokenCount/parseFloat(elapsed)).toFixed(1);
+  setProgress(true,t('prog.done'),100,tokenCount+' tokens \u00b7 '+speed+' tok/s \u00b7 '+elapsed+'s');
+  setTimeout(function(){ setProgress(false,'',0,''); },2500);
+  document.getElementById('out-stats').textContent=tokenCount+' tokens \u00b7 '+elapsed+'s \u00b7 '+speed+' tok/s';
+  document.getElementById('export-btns').style.display='flex';
+  resetButtons();
+  // Save to history
+  addHistory(docText, _resultRaw, model, tokenCount, elapsed);
+}
+
+function renderOutput(raw) {
+  // Simple syntax highlighting via innerHTML
+  var html = escHtml(raw);
+  // Section headers (CAPS lines ending with :)
+  html = html.replace(/^([A-ZŻŹĆŃÓŁĘĄŚ &amp;/]+:)$/gm, '<span class="out-section">$1</span>');
+  // Requirements R-XX
+  html = html.replace(/(R-\d+:)/g, '<span class="out-req">$1</span>');
+  // TC happy
+  html = html.replace(/(\[HAPPY PATH\]|\[HAPPY\])/g, '<span class="out-tc-happy">$1</span>');
+  // TC negative
+  html = html.replace(/(\[NEGATIVE\]|\[NEG\])/g, '<span class="out-tc-neg">$1</span>');
+  // TC boundary
+  html = html.replace(/(\[BOUNDARY\]|\[BOUND\])/g, '<span class="out-tc-bound">$1</span>');
+  // TC numbers
+  html = html.replace(/(TC-\d+)/g, '<span style="color:var(--accent);font-family:var(--mono);font-size:11px;">$1</span>');
+  // Ambiguities
+  html = html.replace(/^(! .+)$/gm, '<span class="out-ambig">$1</span>');
+  // Questions
+  html = html.replace(/^(\? .+)$/gm, '<span class="out-question">$1</span>');
+  var box = document.getElementById('out-box');
+  box.innerHTML = html;
+  box.scrollTop = box.scrollHeight;
+  _resultText = raw;
+}
+
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showErr(msg){
+  document.getElementById('out-wrap').style.display='flex';
+  document.getElementById('out-wrap').style.flexDirection='column';
+  document.getElementById('out-box').textContent=msg;
+  document.getElementById('out-box').style.color='var(--err)';
+  setTimeout(function(){ document.getElementById('out-box').style.color=''; },3000);
+}
+
+function setProgress(show,label,pct,detail){
+  var wrap=document.getElementById('prog-wrap');
+  if(!show){ wrap.style.display='none'; return; }
+  wrap.style.display='flex'; wrap.style.flexDirection='column';
+  document.getElementById('prog-label').textContent=label;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-detail').textContent=detail;
+}
+
+function stopAnalysis(){ if(_abort){ _abort.abort(); _abort=null; } }
+function resetButtons(){
+  document.getElementById('run-btn').disabled=false;
+  document.getElementById('stop-btn').style.display='none';
+}
+
+function clearAll(){
+  document.getElementById('an-text').value='';
+  _fileText=''; _resultText=''; _resultRaw='';
+  if(typeof _imageBase64!=='undefined'){_imageBase64=''; _imageExtractedText='';}
+  document.getElementById('drop-label').textContent=t('drop.label');
+  document.getElementById('drop-meta').textContent='';
+  document.getElementById('an-text-meta').textContent='';
+  var il=document.getElementById('img-drop-label'); if(il) il.textContent=t('img.drop');
+  var im=document.getElementById('img-drop-meta'); if(im) im.textContent='';
+  var ip=document.getElementById('img-preview-wrap'); if(ip) ip.style.display='none';
+  document.getElementById('out-box').innerHTML='';
+  document.getElementById('out-wrap').style.display='none';
+  document.getElementById('export-btns').style.display='none';
+  document.getElementById('out-stats').textContent='';
+  setProgress(false,'',0,'');
+  stopAnalysis();
+}
+
+// ── Copy ─────────────────────────────────────────────────────────
+function copyResult(){
+  var text = _resultText;
+  if(navigator&&navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).catch(function(){ fallbackCopy(text); });
+  } else { fallbackCopy(text); }
+}
+function fallbackCopy(text){
+  var ta=document.createElement('textarea'); ta.value=text;
+  document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+}
+
+// ── Export .txt ──────────────────────────────────────────────────
+function exportTxt(){
+  download('docta-analysis.txt', _resultText, 'text/plain');
+}
+
+// ── Export .md ───────────────────────────────────────────────────
+function exportMd(){
+  var md = _resultText
+    .replace(/^([A-ZŻŹĆŃÓŁĘĄŚ &/]+:)$/gm, function(m,g){ return '## '+g.replace(/:$/,''); })
+    .replace(/^(R-\d+:.+)$/gm, '- **$1**')
+    .replace(/^(TC-\d+.+)$/gm, '### $1')
+    .replace(/^(! .+)$/gm, '> ⚠️ $1')
+    .replace(/^(\? .+)$/gm, '> ❓ $1');
+  download('docta-analysis.md', md, 'text/markdown');
+}
+
+// ── Export .docx ─────────────────────────────────────────────────
+function exportDocx(){
+  // Build minimal docx using raw XML (no library needed)
+  var lines = _resultText.split('\n');
+  var paras = lines.map(function(line){
+    var esc = line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    var isSection = /^[A-ZŻŹĆŃÓŁĘĄŚ &\/]+:$/.test(line.trim());
+    var isTC = /^TC-\d+/.test(line.trim());
+    var isReq = /^R-\d+:/.test(line.trim());
+    var bold = isSection||isTC||isReq;
+    var color = isSection?'1A6B3A':isTC?'2255AA':isReq?'225599':'000000';
+    return '<w:p><w:pPr><w:spacing w:after="80"/></w:pPr><w:r><w:rPr>'+(bold?'<w:b/>':'')+'<w:color w:val="'+color+'"/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">'+esc+'</w:t></w:r></w:p>';
+  }).join('');
+
+  var docXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+paras+'<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>';
+  var relsXml = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
+  var wordRelsXml = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+  var contentTypesXml = '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>';
+
+  // Build ZIP manually
+  var zip = buildZip([
+    {name:'[Content_Types].xml', data:contentTypesXml},
+    {name:'_rels/.rels', data:relsXml},
+    {name:'word/document.xml', data:docXml},
+    {name:'word/_rels/document.xml.rels', data:wordRelsXml},
+  ]);
+  downloadBlob('docta-analysis.docx', zip, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+}
+
+// ── Export .xlsx ──────────────────────────────────────────────────
+function exportXlsx(){
+  // Parse TC from result text
+  var tcs = [];
+  var lines = _resultText.split('\n');
+  var current = null;
+  lines.forEach(function(line){
+    var tcMatch = line.match(/^(TC-\d+)\s+\[(HAPPY PATH|NEGATIVE|BOUNDARY|HAPPY|NEG|BOUND)\]\s+(.+)/);
+    if(tcMatch){
+      if(current) tcs.push(current);
+      current = {id:tcMatch[1],cat:tcMatch[2],name:tcMatch[3].trim(),pre:'',input:'',expected:''};
+    } else if(current){
+      var pre = line.match(/^\s+(?:Precondition|Warunek wstepny):\s*(.+)/i);
+      var inp = line.match(/^\s+(?:Input|Wejscie):\s*(.+)/i);
+      var exp = line.match(/^\s+(?:Expected result|Oczekiwany wynik):\s*(.+)/i);
+      if(pre) current.pre = pre[1];
+      if(inp) current.input = inp[1];
+      if(exp) current.expected = exp[1];
+    }
+  });
+  if(current) tcs.push(current);
+
+  // Also collect requirements
+  var reqs = [];
+  lines.forEach(function(line){
+    var m = line.match(/^(R-\d+):\s*(.+)/);
+    if(m) reqs.push({id:m[1],req:m[2]});
+  });
+
+  // Build xlsx XML
+  var sharedStrings = [];
+  var ssIndex = {};
+  function addSS(s){ s=String(s||''); if(ssIndex[s]===undefined){ssIndex[s]=sharedStrings.length;sharedStrings.push(s);} return ssIndex[s]; }
+
+  // TC sheet rows
+  var tcHeaders=['ID','Category','Name','Precondition','Input','Expected Result'];
+  var tcRows=[tcHeaders].concat(tcs.map(function(tc){return[tc.id,tc.cat,tc.name,tc.pre,tc.input,tc.expected];}));
+
+  // Req sheet rows
+  var reqHeaders=['ID','Requirement'];
+  var reqRows=[reqHeaders].concat(reqs.map(function(r){return[r.id,r.req];}));
+
+  function makeSheet(rows){
+    var cells='';
+    rows.forEach(function(row,ri){
+      cells+='<row r="'+(ri+1)+'">';
+      row.forEach(function(val,ci){
+        var col=String.fromCharCode(65+ci);
+        var addr=col+(ri+1);
+        var idx=addSS(val);
+        cells+='<c r="'+addr+'" t="s"><v>'+idx+'</v></c>';
+      });
+      cells+='</row>';
+    });
+    return '<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'+cells+'</sheetData></worksheet>';
+  }
+
+  var tcSheet=makeSheet(tcRows);
+  var reqSheet=makeSheet(reqRows);
+  var ssXml='<?xml version="1.0" encoding="UTF-8"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="'+sharedStrings.length+'" uniqueCount="'+sharedStrings.length+'">'+sharedStrings.map(function(s){return'<si><t xml:space="preserve">'+s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</t></si>';}).join('')+'</sst>';
+  var workbookXml='<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Test Cases" sheetId="1" r:id="rId1"/><sheet name="Requirements" sheetId="2" r:id="rId2"/></sheets></workbook>';
+  var wbRels='<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/></Relationships>';
+  var rels='<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  var ct='<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/></Types>';
+
+  var zip=buildZip([
+    {name:'[Content_Types].xml',data:ct},
+    {name:'_rels/.rels',data:rels},
+    {name:'xl/workbook.xml',data:workbookXml},
+    {name:'xl/_rels/workbook.xml.rels',data:wbRels},
+    {name:'xl/worksheets/sheet1.xml',data:tcSheet},
+    {name:'xl/worksheets/sheet2.xml',data:reqSheet},
+    {name:'xl/sharedStrings.xml',data:ssXml},
+  ]);
+  downloadBlob('docta-analysis.xlsx',zip,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+}
+
+// ── Minimal ZIP builder ────────────────────────────────────────────
+function buildZip(files){
+  var parts=[]; var centralDir=[]; var offset=0;
+  function crc32(str){
+    var crc=0xFFFFFFFF;
+    var tbl=[];
+    for(var i=0;i<256;i++){var c=i;for(var j=0;j<8;j++){c=c&1?(0xEDB88320^(c>>>1)):(c>>>1);}tbl[i]=c;}
+    for(var k=0;k<str.length;k++){crc=tbl[(crc^str.charCodeAt(k))&0xFF]^(crc>>>8);}
+    return (crc^0xFFFFFFFF)>>>0;
+  }
+  function u16(n){return String.fromCharCode(n&0xFF,(n>>8)&0xFF);}
+  function u32(n){return String.fromCharCode(n&0xFF,(n>>8)&0xFF,(n>>16)&0xFF,(n>>24)&0xFF);}
+  function strToBytes(s){
+    var out='';
+    for(var i=0;i<s.length;i++){
+      var c=s.charCodeAt(i);
+      if(c<128){out+=String.fromCharCode(c);}
+      else if(c<2048){out+=String.fromCharCode(192|(c>>6),128|(c&63));}
+      else{out+=String.fromCharCode(224|(c>>12),128|((c>>6)&63),128|(c&63));}
+    }
+    return out;
+  }
+  files.forEach(function(f){
+    var data=strToBytes(f.data);
+    var name=f.name;
+    var crc=crc32(data);
+    var sz=data.length;
+    var nm=name.length;
+    var lh='\x50\x4B\x03\x04'+u16(20)+u16(0)+u16(0)+u16(0)+u16(0)+u32(crc)+u32(sz)+u32(sz)+u16(nm)+u16(0)+name+data;
+    var cd='\x50\x4B\x01\x02'+u16(20)+u16(20)+u16(0)+u16(0)+u16(0)+u16(0)+u32(crc)+u32(sz)+u32(sz)+u16(nm)+u16(0)+u16(0)+u16(0)+u16(0)+u32(0)+u32(offset)+name;
+    parts.push(lh); centralDir.push(cd); offset+=lh.length;
+  });
+  var cd=centralDir.join('');
+  var eocd='\x50\x4B\x05\x06'+u16(0)+u16(0)+u16(files.length)+u16(files.length)+u32(cd.length)+u32(offset)+u16(0);
+  var blob=new Blob([parts.join('')+cd+eocd],{type:'application/zip'});
+  return blob;
+}
+
+function download(filename,text,mime){
+  var blob=new Blob([text],{type:mime});
+  downloadBlob(filename,blob,mime);
+}
+function downloadBlob(filename,blob,mime){
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+}
+
+// ── History ───────────────────────────────────────────────────────
+var _history=[];
+function addHistory(docText,result,model,tokens,elapsed){
+  var item={
+    ts:new Date().toLocaleTimeString(),
+    preview:docText.slice(0,80).replace(/\n/g,' ')+'...',
+    result:result,
+    model:model,
+    tokens:tokens,
+    elapsed:elapsed
+  };
+  _history.unshift(item);
+  if(_history.length>20) _history.pop();
+  renderHistory();
+}
+
+function renderHistory(){
+  var list=document.getElementById('hist-list');
+  if(!_history.length){
+    list.innerHTML='<div style="font-size:12px;color:var(--text3);" data-i="history.empty">'+t('history.empty')+'</div>';
+    return;
+  }
+  list.innerHTML=_history.map(function(item,i){
+    return '<div class="hist-item" onclick="loadHistory('+i+')">'
+      +'<div class="hist-title">'+escHtml(item.preview)+'</div>'
+      +'<div class="hist-meta">'+item.ts+' \u00b7 '+item.model+' \u00b7 '+item.tokens+' tokens \u00b7 '+item.elapsed+'s</div>'
+      +'</div>';
+  }).join('');
+}
+
+function loadHistory(i){
+  var item=_history[i];
+  if(!item) return;
+  _resultRaw=item.result; _resultText=item.result;
+  document.getElementById('out-wrap').style.display='flex';
+  document.getElementById('out-wrap').style.flexDirection='column';
+  document.getElementById('export-btns').style.display='flex';
+  document.getElementById('out-stats').textContent=item.tokens+' tokens \u00b7 '+item.elapsed+'s \u00b7 '+item.model;
+  renderOutput(item.result);
+  // Switch to analyser
+  document.querySelectorAll('.nav-item').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.panel').forEach(function(el){el.classList.remove('active');});
+  document.querySelector('.nav-item').classList.add('active');
+  document.getElementById('panel-analyser').classList.add('active');
+}
+
+function clearHistory(){ _history=[]; renderHistory(); }
+
+// ── Settings ──────────────────────────────────────────────────────
+function saveSettings(){
+  _ollamaUrl=document.getElementById('set-url').value.trim();
+  document.getElementById('an-model').value=document.getElementById('set-model').value;
+  checkOllama();
+  var msg=document.getElementById('set-msg');
+  msg.style.display='block';
+  msg.textContent=LANG==='pl'?'Zapisano.':'Saved.';
+  setTimeout(function(){msg.style.display='none';},2000);
+}
+
+function resetSettings(){
+  document.getElementById('set-url').value='http://localhost:11434';
+  document.getElementById('set-model').value='qwen2.5:7b';
+  saveSettings();
+}
+
+// ── localStorage helpers ─────────────────────────────────────────
+var LS_HIST = 'docta_history_v1';
+var LS_SETTINGS = 'docta_settings_v1';
+var LS_TEMPLATES = 'docta_templates_v1';
+
+function lsGet(key) {
+  try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e) { return null; }
+}
+function lsSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+}
+
+// ── History ──────────────────────────────────────────────────────
+var _history = [];
+
+function addHistory(docText, result, model, tokens, elapsed) {
+  var item = {
+    id: Date.now(),
+    ts: new Date().toLocaleTimeString(),
+    date: new Date().toLocaleDateString(),
+    preview: docText.slice(0,80).replace(/\n/g,' ') + (docText.length>80?'...':''),
+    result: result,
+    model: model,
+    tokens: tokens,
+    elapsed: elapsed,
+    chars: docText.length
+  };
+  _history.unshift(item);
+  if (_history.length > 50) _history.pop();
+  lsSet(LS_HIST, _history);
+  renderHistory();
+}
+
+function loadHistoryFromLS() {
+  var saved = lsGet(LS_HIST);
+  if (saved && Array.isArray(saved)) { _history = saved.slice(0,50); renderHistory(); }
+}
+
+function renderHistory() {
+  var list = document.getElementById('hist-list');
+  var cnt  = document.getElementById('hist-count');
+  if (cnt) cnt.textContent = _history.length + ' ' + (LANG==='pl' ? 'analiz (zapisano)' : 'analyses (saved)');
+  if (!_history.length) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--text3);">' + t('history.empty') + '</div>';
+    return;
+  }
+  list.innerHTML = _history.map(function(item, i) {
+    return '<div class="hist-item" onclick="loadHistory(' + i + ')" style="position:relative;">'
+      + '<div style="display:flex;align-items:baseline;gap:8px;">'
+      + '<div class="hist-title">' + escHtml(item.preview) + '</div>'
+      + '<button onclick="event.stopPropagation();deleteHistoryItem(' + i + ')" style="margin-left:auto;font-family:var(--mono);font-size:10px;padding:1px 6px;border:1px solid var(--border2);background:transparent;color:var(--text3);border-radius:2px;cursor:pointer;flex-shrink:0;">x</button>'
+      + '</div>'
+      + '<div class="hist-meta">' + (item.date||'') + ' ' + item.ts + ' \u00b7 ' + item.model + ' \u00b7 ' + item.tokens + ' tokens \u00b7 ' + item.elapsed + 's</div>'
+      + '</div>';
+  }).join('');
+}
+
+function loadHistory(i) {
+  var item = _history[i];
+  if (!item) return;
+  _resultRaw = item.result; _resultText = item.result;
+  document.getElementById('out-wrap').style.display = 'flex';
+  document.getElementById('out-wrap').style.flexDirection = 'column';
+  document.getElementById('export-btns').style.display = 'flex';
+  document.getElementById('out-stats').textContent = item.tokens + ' tokens \u00b7 ' + item.elapsed + 's \u00b7 ' + item.model;
+  renderOutput(item.result);
+  document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelector('.nav-item').classList.add('active');
+  document.getElementById('panel-analyser').classList.add('active');
+}
+
+function deleteHistoryItem(i) {
+  _history.splice(i,1);
+  lsSet(LS_HIST, _history);
+  renderHistory();
+}
+
+function clearHistory() {
+  _history = [];
+  lsSet(LS_HIST, []);
+  renderHistory();
+}
+
+function exportHistoryXlsx() {
+  if (!_history.length) return;
+  var sharedStrings = []; var ssIndex = {};
+  function addSS(s) { s=String(s||''); if(ssIndex[s]===undefined){ssIndex[s]=sharedStrings.length;sharedStrings.push(s);} return ssIndex[s]; }
+  var headers = ['Date','Time','Model','Tokens','Elapsed(s)','Preview','Result'];
+  var rows = [headers].concat(_history.map(function(h) {
+    return [h.date||'', h.ts, h.model, String(h.tokens), String(h.elapsed), h.preview, (h.result||'').slice(0,2000)];
+  }));
+  var cells = '';
+  rows.forEach(function(row,ri) {
+    cells += '<row r="'+(ri+1)+'">';
+    row.forEach(function(val,ci) { var col=String.fromCharCode(65+ci); cells+='<c r="'+col+(ri+1)+'" t="s"><v>'+addSS(val)+'</v></c>'; });
+    cells += '</row>';
+  });
+  var sheet = '<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'+cells+'</sheetData></worksheet>';
+  var ssXml = '<?xml version="1.0" encoding="UTF-8"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="'+sharedStrings.length+'" uniqueCount="'+sharedStrings.length+'">'+sharedStrings.map(function(s){return'<si><t xml:space="preserve">'+String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</t></si>';}).join('')+'</sst>';
+  var zip = buildZip([
+    {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/></Types>'},
+    {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+    {name:'xl/workbook.xml',data:'<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="History" sheetId="1" r:id="rId1"/></sheets></workbook>'},
+    {name:'xl/_rels/workbook.xml.rels',data:'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/></Relationships>'},
+    {name:'xl/worksheets/sheet1.xml',data:sheet},
+    {name:'xl/sharedStrings.xml',data:ssXml},
+  ]);
+  downloadBlob('docta-history.xlsx', zip, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+}
+
+// ── Prompt templates ─────────────────────────────────────────────
+var BUILTIN_TEMPLATES = [
+  { name:'API Testing',     content:'Focus on REST API testing. Include HTTP status codes in expected results. Add schema validation notes.' },
+  { name:'Functional Spec', content:'Follow IEEE 830 style. Number requirements hierarchically. Flag any conflicting requirements.' },
+  { name:'User Story',      content:'Use Given/When/Then format for test cases. Focus on user acceptance criteria.' },
+  { name:'GDPR / Security', content:'Highlight personal data handling. Flag GDPR risks. Include auth/authorization test cases.' }
+];
+
+var _customTemplates = [];
+var _activeTmpl = null;
+
+function loadTemplates() {
+  var saved = lsGet(LS_TEMPLATES);
+  if (saved && Array.isArray(saved)) _customTemplates = saved;
+  renderTmplChips();
+}
+
+function renderTmplChips() {
+  var wrap = document.getElementById('tmpl-chips');
+  if (!wrap) return;
+  var all = BUILTIN_TEMPLATES.concat(_customTemplates.map(function(t){ return {name:t.name,content:t.content,custom:true}; }));
+  wrap.innerHTML = all.map(function(tmpl,i) {
+    var isActive = _activeTmpl && _activeTmpl.name===tmpl.name;
+    var border = isActive ? 'border-color:var(--accent2);color:var(--accent);background:rgba(57,255,122,.08);' : '';
+    var del = tmpl.custom ? ' <span onclick="event.stopPropagation();deleteTmpl('+i+')" style="color:var(--text3);margin-left:2px;cursor:pointer;">x</span>' : '';
+    return '<span onclick="selectTmpl('+i+')" style="display:inline-flex;align-items:center;font-size:11px;padding:3px 10px;border:1px solid var(--border2);border-radius:12px;cursor:pointer;margin:2px;'+border+'">' + escHtml(tmpl.name) + del + '</span>';
+  }).join('');
+}
+
+function selectTmpl(i) {
+  var all = BUILTIN_TEMPLATES.concat(_customTemplates);
+  _activeTmpl = all[i] || null;
+  renderTmplChips();
+}
+
+function saveTmpl() {
+  var name    = (document.getElementById('tmpl-name').value||'').trim();
+  var content = (document.getElementById('tmpl-content').value||'').trim();
+  if (!name || !content) return;
+  _customTemplates = _customTemplates.filter(function(t){ return t.name!==name; });
+  _customTemplates.push({name:name, content:content});
+  lsSet(LS_TEMPLATES, _customTemplates);
+  document.getElementById('tmpl-name').value = '';
+  document.getElementById('tmpl-content').value = '';
+  renderTmplChips();
+}
+
+function clearTmpl() {
+  document.getElementById('tmpl-name').value = '';
+  document.getElementById('tmpl-content').value = '';
+  _activeTmpl = null;
+  renderTmplChips();
+}
+
+function deleteTmpl(i) {
+  var builtin = BUILTIN_TEMPLATES.length;
+  if (i >= builtin) {
+    _customTemplates.splice(i - builtin, 1);
+    lsSet(LS_TEMPLATES, _customTemplates);
+    if (_activeTmpl && _activeTmpl.name === _customTemplates[i-builtin]) _activeTmpl = null;
+    renderTmplChips();
+  }
+}
+
+// ── Override buildPrompt to append active template ────────────────
+// Capture original BEFORE defining new buildPrompt (avoids infinite recursion)
+var _baseBuildPrompt = buildPrompt;
+buildPrompt = function(docText, opts, outLang) {
+  var base = _baseBuildPrompt(docText, opts, outLang);
+  if (_activeTmpl && _activeTmpl.content) {
+    base += '\n\nAdditional instructions: ' + _activeTmpl.content;
+  }
+  return base;
+};
+
+// ── Settings with localStorage ────────────────────────────────────
+var _baseSaveSettings = saveSettings;
+saveSettings = function() {
+  _baseSaveSettings();
+  lsSet(LS_SETTINGS, { url: _ollamaUrl, model: document.getElementById('an-model').value });
+};
+
+function loadSettings() {
+  var saved = lsGet(LS_SETTINGS);
+  if (!saved) return;
+  if (saved.url) { document.getElementById('set-url').value = saved.url; _ollamaUrl = saved.url; }
+  if (saved.model) { var sel = document.getElementById('an-model'); if (sel) sel.value = saved.model; }
+}
+
+// ── Image handling ────────────────────────────────────────────────
+var _imageBase64 = '';
+var _imageExtractedText = '';
+var _imageMime = 'image/jpeg';
+var VISION_MODELS = ['llava','moondream','bakllava','llava-phi3','cogvlm','minicpm'];
+
+function handleImage(file) {
+  if (!file) return;
+  var label    = document.getElementById('img-drop-label');
+  var meta     = document.getElementById('img-drop-meta');
+  var prevWrap = document.getElementById('img-preview-wrap');
+  var prev     = document.getElementById('img-preview');
+  _imageBase64 = ''; _imageExtractedText = '';
+  label.textContent = 'Loading: ' + file.name + '...';
+  meta.textContent  = '';
+  _imageMime = file.type || 'image/jpeg';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var dataUrl = e.target.result;
+    _imageBase64 = dataUrl.split(',')[1];
+    label.textContent = file.name;
+    meta.textContent  = (file.size/1024).toFixed(0) + ' KB \u00b7 ' + file.type;
+    prev.src = dataUrl;
+    prevWrap.style.display = 'block';
+    checkVisionModel();
+  };
+  reader.readAsDataURL(file);
+}
+
+function checkVisionModel() {
+  var model = document.getElementById('img-model').value;
+  var warn  = document.getElementById('img-model-warn');
+  var base  = model.split(':')[0].toLowerCase();
+  var isVision = VISION_MODELS.some(function(m){ return base.includes(m); });
+  warn.style.display = isVision ? 'none' : 'block';
+  if (!isVision) warn.textContent = t('img.warn.nomodel');
+}
+
+(function() {
+  var iz = document.getElementById('img-drop-zone');
+  if (!iz) return;
+  iz.addEventListener('dragover', function(e){ e.preventDefault(); iz.classList.add('dragover'); });
+  iz.addEventListener('dragleave', function(){ iz.classList.remove('dragover'); });
+  iz.addEventListener('drop', function(e){ e.preventDefault(); iz.classList.remove('dragover'); if(e.dataTransfer.files[0]) handleImage(e.dataTransfer.files[0]); });
+})();
+
+// ── runAnalysis override for image mode ───────────────────────────
+var _baseRunAnalysis = runAnalysis;
+runAnalysis = function() {
+  var activePanel = document.querySelector('.input-panel.active');
+  if (activePanel && activePanel.id === 'inp-image') {
+    runImageAnalysis();
+  } else {
+    _baseRunAnalysis();
+  }
+};
+
+function runImageAnalysis() {
+  if (!_imageBase64) { showErr(LANG==='pl' ? 'Wgraj obraz najpierw.' : 'Upload an image first.'); return; }
+  if (!_ollamaOk)    { showErr(LANG==='pl' ? 'Ollama nie dzia\u0142a.' : 'Ollama is not running.'); return; }
+  var opts = {
+    req:       document.getElementById('opt-req').checked,
+    tc:        document.getElementById('opt-tc').checked,
+    ambig:     document.getElementById('opt-ambig').checked,
+    questions: document.getElementById('opt-questions').checked,
+    matrix:    document.getElementById('opt-matrix').checked
+  };
+  if (!opts.req && !opts.tc && !opts.ambig && !opts.questions && !opts.matrix) {
+    showErr(LANG==='pl' ? 'Zaznacz przynajmniej jedn\u0105 opcj\u0119.' : 'Select at least one output option.');
+    return;
+  }
+  var model   = document.getElementById('img-model').value;
+  var outLang = document.getElementById('opt-lang').value;
+  var isPL    = outLang === 'pl';
+  var extractPrompt = isPL
+    ? 'Opisz szczegolowo co widzisz na tym obrazie. Wyciagnij caly widoczny tekst, wymagania, opisy funkcjonalnosci.'
+    : 'Describe in detail what you see. Extract all visible text, requirements, functional descriptions. Preserve structure.';
+  _resultText = ''; _resultRaw = ''; _imageExtractedText = '';
+  _abort = new AbortController();
+  document.getElementById('run-btn').disabled = true;
+  document.getElementById('stop-btn').style.display = 'inline-block';
+  document.getElementById('export-btns').style.display = 'none';
+  document.getElementById('out-wrap').style.display = 'flex';
+  document.getElementById('out-wrap').style.flexDirection = 'column';
+  document.getElementById('out-box').innerHTML = '';
+  document.getElementById('out-stats').textContent = '';
+  setProgress(true, t('img.processing'), 5, '');
+  var startTime = Date.now();
+  fetch(_ollamaUrl + '/api/generate', {
+    method:'POST', headers:{'Content-Type':'application/json'}, signal:_abort.signal,
+    body: JSON.stringify({ model:model, prompt:extractPrompt, images:[_imageBase64], stream:true, options:{temperature:0.1} })
+  })
+  .then(function(response) {
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    var reader  = response.body.getReader();
+    var decoder = new TextDecoder();
+    var extracted = ''; var tokenCount = 0;
+    function read() {
+      return reader.read().then(function(result) {
+        if (result.done) {
+          _imageExtractedText = extracted;
+          phase2Generate(extracted, opts, outLang, model, startTime, tokenCount);
+          return;
+        }
+        var chunk = decoder.decode(result.value, {stream:true});
+        chunk.split('\n').forEach(function(line) {
+          line = line.trim(); if (!line) return;
+          try {
+            var data = JSON.parse(line);
+            if (data.response) { extracted += data.response; tokenCount++; }
+            if (data.done) { _imageExtractedText = extracted; phase2Generate(extracted, opts, outLang, model, startTime, tokenCount); return; }
+          } catch(e) {}
+        });
+        var pct = Math.min(45, Math.round(5 + (tokenCount/200)*40));
+        setProgress(true, t('img.processing'), pct, tokenCount + ' tokens \u00b7 extracting...');
+        return read();
+      });
+    }
+    return read();
+  })
+  .catch(function(e) {
+    if (e.name !== 'AbortError') showErr('Error: ' + e.message + '\nMake sure you have a vision model: ollama pull llava:7b');
+    setProgress(false,'',0,''); resetButtons();
+  });
+}
+
+function phase2Generate(extractedText, opts, outLang, model, startTime, phase1Tokens) {
+  if (!extractedText.trim()) {
+    showErr('Could not extract text from image. Try a different vision model.');
+    resetButtons(); setProgress(false,'',0,''); return;
+  }
+  setProgress(true, t('prog.generating'), 50, 'Image extracted \u00b7 generating test cases...');
+  var linePrefix = LANG==='pl' ? '[Wyci\u0105gni\u0119ty tekst z obrazu:]' : '[Extracted from image:]';
+  var preview = linePrefix + '\n' + extractedText.slice(0,300) + (extractedText.length>300?'...':'') + '\n\n';
+  renderOutput(preview);
+  var prompt = buildPrompt(extractedText, opts, outLang);
+  var tokenCount = phase1Tokens; var lastUpdate = 0; var lastPct = 50;
+  fetch(_ollamaUrl + '/api/generate', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    signal: _abort ? _abort.signal : undefined,
+    body: JSON.stringify({ model:model, prompt:prompt, stream:true, options:{temperature:0.2,top_p:0.9} })
+  })
+  .then(function(response) {
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    var reader = response.body.getReader(); var decoder = new TextDecoder();
+    function read() {
+      return reader.read().then(function(result) {
+        if (result.done) { finish(startTime, tokenCount, extractedText, model); return; }
+        var chunk = decoder.decode(result.value, {stream:true});
+        chunk.split('\n').forEach(function(line) {
+          line = line.trim(); if (!line) return;
+          try {
+            var data = JSON.parse(line);
+            if (data.response) { _resultRaw += data.response; tokenCount++; renderOutput(preview + _resultRaw); }
+            if (data.done) { finish(startTime, tokenCount, extractedText, model); return; }
+          } catch(e) {}
+        });
+        var now = Date.now(); if (now - lastUpdate > 250) {
+          lastUpdate = now;
+          var elapsed = (now-startTime)/1000;
+          var pct = Math.min(92, Math.round(50 + (_resultRaw.length/Math.max(extractedText.length/3,150))*40));
+          if (pct < lastPct) pct = lastPct; lastPct = pct;
+          setProgress(true, t('prog.generating'), pct, tokenCount + ' tok \u00b7 ' + (tokenCount/elapsed).toFixed(1) + ' tok/s');
+        }
+        return read();
+      });
+    }
+    return read();
+  })
+  .catch(function(e) { if (e.name!=='AbortError') showErr('Phase 2 error: '+e.message); setProgress(false,'',0,''); resetButtons(); });
+}
+
+// ── Batch analyser ────────────────────────────────────────────────
+var _batchFiles   = [];
+var _batchResults = [];
+var _batchAbort   = false;
+
+(function() {
+  var bd = document.getElementById('batch-drop');
+  if (!bd) return;
+  bd.addEventListener('dragover',  function(e){ e.preventDefault(); bd.classList.add('dragover'); });
+  bd.addEventListener('dragleave', function(){  bd.classList.remove('dragover'); });
+  bd.addEventListener('drop', function(e){ e.preventDefault(); bd.classList.remove('dragover'); batchAddFiles(e.dataTransfer.files); });
+})();
+
+function batchAddFiles(fileList) {
+  for (var i=0; i<fileList.length; i++) {
+    var f = fileList[i];
+    var ext = f.name.split('.').pop().toLowerCase();
+    if (['txt','pdf','docx'].indexOf(ext) < 0) continue;
+    if (_batchFiles.some(function(b){ return b.name===f.name; })) continue;
+    _batchFiles.push({name:f.name, file:f, ext:ext, text:null, status:'pending'});
+  }
+  renderBatchList();
+}
+
+function renderBatchList() {
+  var list = document.getElementById('batch-file-list');
+  if (!list) return;
+  if (!_batchFiles.length) { list.innerHTML=''; return; }
+  var icon = {pending:'\u25cb',loading:'\u25b6',done:'\u2713',error:'\u2717'};
+  var color = {pending:'var(--text3)',loading:'var(--warn)',done:'var(--accent)',error:'var(--err)'};
+  list.innerHTML = _batchFiles.map(function(f,i) {
+    return '<div style="display:flex;align-items:center;gap:8px;padding:4px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;font-size:11px;">'
+      + '<span style="color:'+color[f.status]+';">'+icon[f.status]+'</span>'
+      + '<span style="flex:1;color:var(--text2);">'+escHtml(f.name)+'</span>'
+      + (f.status==='done' ? '<span style="color:var(--text3);">'+(f.tokens||'')+' tok</span>' : '')
+      + '<button onclick="batchRemove('+i+')" style="font-family:var(--mono);font-size:10px;padding:1px 5px;border:1px solid var(--border2);background:transparent;color:var(--text3);border-radius:2px;cursor:pointer;">x</button>'
+      + '</div>';
+  }).join('');
+}
+
+function batchRemove(i) { _batchFiles.splice(i,1); renderBatchList(); }
+
+function batchClear() {
+  _batchFiles=[]; _batchResults=[];
+  renderBatchList();
+  document.getElementById('batch-results').innerHTML='';
+  document.getElementById('batch-export-btn').style.display='none';
+  setBatchProgress(false,'',0,'');
+}
+
+function setBatchProgress(show, label, pct, detail) {
+  var wrap = document.getElementById('batch-progress-wrap');
+  if (!wrap) return;
+  if (!show) { wrap.style.display='none'; return; }
+  wrap.style.display='flex'; wrap.style.flexDirection='column';
+  document.getElementById('batch-prog-label').textContent = label;
+  document.getElementById('batch-prog-pct').textContent   = pct+'%';
+  document.getElementById('batch-prog-fill').style.width  = pct+'%';
+  document.getElementById('batch-prog-detail').textContent = detail;
+}
+
+function batchStop() { _batchAbort = true; }
+
+async function batchRun() {
+  if (!_batchFiles.length) return;
+  if (!_ollamaOk) { showErr('Ollama is not running.'); return; }
+  var opts = {
+    req:       document.getElementById('b-opt-req').checked,
+    tc:        document.getElementById('b-opt-tc').checked,
+    ambig:     document.getElementById('b-opt-ambig').checked,
+    questions: document.getElementById('b-opt-questions') ? document.getElementById('b-opt-questions').checked : false,
+    matrix:    false
+  };
+  var outLang = document.getElementById('b-opt-lang').value;
+  var model   = document.getElementById('an-model').value;
+  _batchAbort=false; _batchResults=[];
+  document.getElementById('batch-run-btn').disabled=true;
+  document.getElementById('batch-stop-btn').style.display='inline-block';
+  document.getElementById('batch-export-btn').style.display='none';
+  document.getElementById('batch-results').innerHTML='';
+  var total = _batchFiles.length;
+  for (var i=0; i<_batchFiles.length; i++) {
+    if (_batchAbort) break;
+    var bf = _batchFiles[i];
+    bf.status='loading'; renderBatchList();
+    setBatchProgress(true,'Processing: '+bf.name, Math.round((i/total)*100), (i+1)+'/'+total+' files');
+    var text = await batchReadFile(bf);
+    if (!text) { bf.status='error'; renderBatchList(); continue; }
+    var result = await batchAnalyse(text, opts, outLang, model);
+    bf.status = result.ok ? 'done' : 'error';
+    bf.tokens = result.tokens;
+    _batchResults.push({name:bf.name, text:text, result:result.text, tokens:result.tokens, elapsed:result.elapsed});
+    renderBatchList();
+    var card = document.createElement('div');
+    card.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:10px 12px;';
+    card.innerHTML = '<div style="font-size:11px;font-weight:500;color:var(--accent);margin-bottom:4px;">'+escHtml(bf.name)+' \u00b7 '+result.tokens+' tokens \u00b7 '+result.elapsed+'s</div>'
+      + '<div style="font-size:11px;color:var(--text2);white-space:pre-wrap;max-height:120px;overflow-y:auto;">'+escHtml(result.text.slice(0,400))+(result.text.length>400?'...':'')+'</div>';
+    document.getElementById('batch-results').appendChild(card);
+  }
+  setBatchProgress(true, _batchAbort?'Stopped':'Done', 100, _batchResults.length+'/'+total+' completed');
+  setTimeout(function(){ setBatchProgress(false,'',0,''); }, 3000);
+  document.getElementById('batch-run-btn').disabled=false;
+  document.getElementById('batch-stop-btn').style.display='none';
+  if (_batchResults.length>0) document.getElementById('batch-export-btn').style.display='inline-block';
+  if (_batchResults.length>0) {
+    var combined = _batchResults.map(function(r){ return '=== '+r.name+' ===\n'+r.result; }).join('\n\n');
+    var totalTok = _batchResults.reduce(function(s,r){return s+r.tokens;},0);
+    var totalSec = _batchResults.reduce(function(s,r){return s+parseFloat(r.elapsed);},0).toFixed(1);
+    addHistory('[Batch: '+_batchResults.length+' files]', combined, model, totalTok, totalSec);
+  }
+}
+
+function batchReadFile(bf) {
+  return new Promise(function(resolve) {
+    if (bf.text) { resolve(bf.text); return; }
+    var reader = new FileReader();
+    if (bf.ext==='txt') {
+      reader.onload = function(e){ bf.text=e.target.result; resolve(bf.text); };
+      reader.readAsText(bf.file);
+    } else if (bf.ext==='pdf') {
+      reader.onload = function(e) {
+        if (typeof pdfjsLib==='undefined') { resolve(''); return; }
+        pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        pdfjsLib.getDocument(new Uint8Array(e.target.result)).promise.then(function(pdf) {
+          var pages=[]; for(var i=1;i<=pdf.numPages;i++) pages.push(i);
+          return Promise.all(pages.map(function(n){ return pdf.getPage(n).then(function(p){ return p.getTextContent(); }); }));
+        }).then(function(contents) {
+          bf.text=contents.map(function(c){return c.items.map(function(i){return i.str;}).join(' ');}).join('\n\n');
+          resolve(bf.text);
+        }).catch(function(){ resolve(''); });
+      };
+      reader.readAsArrayBuffer(bf.file);
+    } else if (bf.ext==='docx') {
+      reader.onload = function(e) {
+        if (typeof mammoth==='undefined') { resolve(''); return; }
+        mammoth.extractRawText({arrayBuffer:e.target.result}).then(function(r){ bf.text=r.value; resolve(bf.text); }).catch(function(){ resolve(''); });
+      };
+      reader.readAsArrayBuffer(bf.file);
+    } else { resolve(''); }
+  });
+}
+
+function batchAnalyse(text, opts, outLang, model) {
+  return new Promise(function(resolve) {
+    var prompt = buildPrompt(text, opts, outLang);
+    var result=''; var tokenCount=0; var start=Date.now();
+    fetch(_ollamaUrl+'/api/generate', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({model:model, prompt:prompt, stream:true, options:{temperature:0.2}})
+    }).then(function(response) {
+      if (!response.ok) { resolve({ok:false,text:'HTTP '+response.status,tokens:0,elapsed:'0'}); return; }
+      var reader=response.body.getReader(); var decoder=new TextDecoder();
+      function read() {
+        if (_batchAbort) { resolve({ok:true,text:result,tokens:tokenCount,elapsed:((Date.now()-start)/1000).toFixed(1)}); return; }
+        return reader.read().then(function(res) {
+          if (res.done) { resolve({ok:true,text:result,tokens:tokenCount,elapsed:((Date.now()-start)/1000).toFixed(1)}); return; }
+          var chunk=decoder.decode(res.value,{stream:true});
+          chunk.split('\n').forEach(function(line){
+            line=line.trim(); if(!line) return;
+            try{var data=JSON.parse(line);if(data.response){result+=data.response;tokenCount++;}}catch(e){}
+          });
+          return read();
+        });
+      }
+      return read();
+    }).catch(function(e){ resolve({ok:false,text:e.message,tokens:0,elapsed:'0'}); });
+  });
+}
+
+function batchExport() {
+  if (!_batchResults.length) return;
+  var sharedStrings=[]; var ssIndex={};
+  function addSS(s){ s=String(s||''); if(ssIndex[s]===undefined){ssIndex[s]=sharedStrings.length;sharedStrings.push(s);}return ssIndex[s]; }
+  var headers=['File','Tokens','Elapsed(s)','Result'];
+  var rows=[headers].concat(_batchResults.map(function(r){ return [r.name,String(r.tokens),String(r.elapsed),(r.result||'').slice(0,3000)]; }));
+  var cells='';
+  rows.forEach(function(row,ri){
+    cells+='<row r="'+(ri+1)+'">';
+    row.forEach(function(val,ci){var col=String.fromCharCode(65+ci);cells+='<c r="'+col+(ri+1)+'" t="s"><v>'+addSS(val)+'</v></c>';});
+    cells+='</row>';
+  });
+  var sheet='<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'+cells+'</sheetData></worksheet>';
+  var ssXml='<?xml version="1.0" encoding="UTF-8"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="'+sharedStrings.length+'" uniqueCount="'+sharedStrings.length+'">'+sharedStrings.map(function(s){return'<si><t xml:space="preserve">'+String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</t></si>';}).join('')+'</sst>';
+  var zip=buildZip([
+    {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/></Types>'},
+    {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+    {name:'xl/workbook.xml',data:'<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Batch Results" sheetId="1" r:id="rId1"/></sheets></workbook>'},
+    {name:'xl/_rels/workbook.xml.rels',data:'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/></Relationships>'},
+    {name:'xl/worksheets/sheet1.xml',data:sheet},
+    {name:'xl/sharedStrings.xml',data:ssXml},
+  ]);
+  downloadBlob('docta-batch.xlsx', zip, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+}
+
+// ── Extended i18n ─────────────────────────────────────────────────
+(function() {
+  var extraEN = {
+    'nav.tools2':'Tools','nav.batch':'Batch analyser',
+    'btn.exportHist':'\u2193 export .xlsx',
+    'settings.templates':'Prompt templates',
+    'settings.templatesHint':'Select a built-in template or save your own.',
+    'settings.tmplName':'Template name',
+    'settings.tmplContent':'Additional instructions',
+    'btn.saveTmpl':'save template','btn.clearTmpl':'clear',
+    'batch.head':'Batch analyser',
+    'batch.hint':'Upload multiple files. Each analysed separately.',
+    'batch.drop':'Drop .txt / .pdf / .docx files here',
+    'btn.batchRun':'Analyse all',
+    'input.image':'Image / screenshot',
+    'img.drop':'Drop image (.jpg .png .gif .webp) here or click',
+    'img.visionModel':'Vision model',
+    'img.pullHint':'Pull first: ollama pull llava:7b',
+    'img.warn.nomodel':'Model may not support vision. Use llava, llava-phi3, or moondream.',
+    'img.processing':'Extracting text from image...'
+  };
+  var extraPL = {
+    'nav.tools2':'Narz\u0119dzia','nav.batch':'Analiza wsadowa',
+    'btn.exportHist':'\u2193 eksportuj .xlsx',
+    'settings.templates':'Szablony prompt\u00f3w',
+    'settings.templatesHint':'Wybierz wbudowany szablon lub zapisz w\u0142asny.',
+    'settings.tmplName':'Nazwa szablonu',
+    'settings.tmplContent':'Dodatkowe instrukcje',
+    'btn.saveTmpl':'zapisz szablon','btn.clearTmpl':'wyczy\u015b\u0107',
+    'batch.head':'Analiza wsadowa',
+    'batch.hint':'Wgraj kilka plik\u00f3w. Ka\u017cdy analizowany osobno.',
+    'batch.drop':'Upu\u015b\u0107 pliki .txt / .pdf / .docx tutaj',
+    'btn.batchRun':'Analizuj wszystkie',
+    'input.image':'Obraz / screenshot',
+    'img.drop':'Upu\u015b\u0107 obraz (.jpg .png .gif .webp) tutaj lub kliknij',
+    'img.visionModel':'Model vision',
+    'img.pullHint':'Pobierz najpierw: ollama pull llava:7b',
+    'img.warn.nomodel':'Model mo\u017ce nie obs\u0142ugiwa\u0107 obraz\u00f3w. U\u017cyj llava, llava-phi3 lub moondream.',
+    'img.processing':'Wyci\u0105ganie tekstu z obrazu...'
+  };
+  if (i18n.en) Object.keys(extraEN).forEach(function(k){ i18n.en[k]=extraEN[k]; });
+  if (i18n.pl) Object.keys(extraPL).forEach(function(k){ i18n.pl[k]=extraPL[k]; });
+})();
+
+
+// ── Text area live char count ──────────────────────────────────────
+document.getElementById('an-text').addEventListener('input',function(){
+  var v=this.value;
+  document.getElementById('an-text-meta').textContent=v.length>0?v.length.toLocaleString()+' chars \u00b7 '+countWords(v)+' words':'';
+});
+
+// ── Init ──────────────────────────────────────────────────────────
+setLang('en');
+loadSettings();
+loadHistoryFromLS();
+loadTemplates();
+setTimeout(checkOllama, 600);
+</script>
+</body>
+</html>
