@@ -1,0 +1,3031 @@
+### FUNCTIONAL REQUIREMENTS:
+R-01 - The tool should accept text input.
+R-02 - The tool should accept PDF (.pdf) file input.
+R-03 - The tool should accept Word (.docx) file input.
+R-04 - The tool should accept image input in formats .jpg, .png, .gif, and .webp.
+R-05 - The tool should generate functional requirements as a numbered list R-01, R-02...
+R-06 - The tool should generate test cases in TC-001 format with Precondition, Input, Expected result. Categories: HAPPY PATH, NEGATIVE, BOUNDARY.
+R-07 - The tool should identify ambiguities and gaps prefixed with '!'.
+R-08 - The tool should provide questions for dev/analyst prefixed with '?'.
+R-09 - The tool should export results as .txt, .md, .docx (Word), or .xlsx (Excel).
+R-10 - The tool should store analysis history in browser localStorage and survive page refresh.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-001 [HAPPY PATH] Upload a valid PDF file
+  Precondition: A valid PDF file is available.
+  Input: Drag and drop the PDF file into the upload area or browse to select it.
+  Expected result: The tool extracts text from the PDF page by page, generates test cases based on the extracted content, and displays them in TC-001 format with all categories.
+
+#### NEGATIVE
+TC-002 [NEGATIVE] Upload an invalid PDF file (scanned image-only)
+  Precondition: An invalid PDF file is available.
+  Input: Drag and drop the scanned image-only PDF file into the upload area or browse to select it.
+  Expected result: The tool does not extract text from the uploaded file, displays a warning message, and generates test cases based on any visible text.
+
+#### BOUNDARY
+TC-003 [BOUNDARY] Upload a large Word document (over 10 MB)
+  Precondition: A large Word document over 10 MB is available.
+  Input: Drag and drop the large Word document into the upload area or browse to select it.
+  Expected result: The tool extracts text from the document, generates test cases based on the extracted content, but may time out due to size. The user should be notified of potential timeouts.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how the tool handles documents with complex layouts in PDF files.
+! The tool's handling of scanned image-only PDFs is unclear; it should provide a clear message or alternative method for such cases.
+! There are no guidelines on how to handle documents that exceed available RAM, which may cause analysis to stop.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle documents with complex layouts in PDF files?
+? Can the tool support more image formats besides .jpg, .png, .gif, and .webp for better compatibility?
+? What is the exact threshold for document size that may cause analysis to stop or time out?
+
+### FUNCTIONAL REQUIREMENTS:
+R-11 - The tool should allow users to add multiple files in batch mode.
+R-12 - The tool should process each file sequentially when running a batch analysis.
+R-13 - The tool should export all batch results into a single Excel file with detailed information per file.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-004 [HAPPY PATH] Add multiple .txt, .pdf, and .docx files to the batch analyser
+  Precondition: Multiple valid text, PDF, or Word documents are available.
+  Input: Drag and drop the files into the batch analyser's drop zone or click to browse for them.
+  Expected result: The tool processes each file sequentially, generates test cases based on the content of each document, and exports all results in a single Excel file.
+
+#### NEGATIVE
+TC-005 [NEGATIVE] Add duplicate filenames in batch mode
+  Precondition: Two files with the same filename are available.
+  Input: Drag and drop both files into the batch analyser's drop zone or click to browse for them.
+  Expected result: The tool skips the second file with the duplicate name, displays a warning message, and processes only unique filenames.
+
+#### BOUNDARY
+TC-006 [BOUNDARY] Add a large number of files (over 50) in batch mode
+  Precondition: Over 50 valid text, PDF, or Word documents are available.
+  Input: Drag and drop all the files into the batch analyser's drop zone or click to browse for them.
+  Expected result: The tool processes each file sequentially but may time out due to the large number of files. Users should be notified of potential timeouts.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how the tool handles duplicate filenames in batch mode.
+! There are no guidelines on how the tool manages memory when processing a large number of files, which could lead to analysis stopping or timing out.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle duplicate filenames in batch mode?
+? Can the tool provide more detailed error messages for timeouts due to large numbers of files or complex documents?
+
+### FUNCTIONAL REQUIREMENTS:
+R-14 - The tool should allow users to customize output options and templates.
+R-15 - The tool should save custom templates for consistent output style across projects.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-007 [HAPPY PATH] Set a default model in the settings tab
+  Precondition: A specific model is available in Ollama.
+  Input: Enter the URL and select the desired model in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-008 [NEGATIVE] Set a non-existent model in the settings tab
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-009 [BOUNDARY] Add a custom template with instructions for API testing
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save.
+  Expected result: The tool saves the custom template and activates it by highlighting the chip.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory when loading multiple templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-16 - The tool should allow users to reference supported models.
+R-17 - The tool should recommend a model based on available RAM.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-010 [HAPPY PATH] Pull the qwen2.5:7b model using terminal commands
+  Precondition: Ollama is running and accessible via terminal.
+  Input: Run the command `ollama pull qwen2.5:7b` in a terminal window.
+  Expected result: The tool successfully pulls the qwen2.5:7b model, confirming its availability.
+
+#### NEGATIVE
+TC-011 [NEGATIVE] Pull an unsupported model using terminal commands
+  Precondition: An unsupported or non-existent model is entered.
+  Input: Run the command `ollama pull invalid_model` in a terminal window.
+  Expected result: The tool displays an error message indicating that the model is not supported.
+
+#### BOUNDARY
+TC-012 [BOUNDARY] Recommend a text analysis model for 8 GB RAM
+  Precondition: The available RAM is 8 GB.
+  Input: Check the "Recommended setup for 8 GB RAM" section in the documentation.
+  Expected result: The tool recommends using qwen2.5:7b as it has the best quality/speed balance and requires approximately 5 GB of RAM.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle unsupported models when pulling them via terminal commands.
+! There are no guidelines on how the tool manages memory when loading multiple models, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle unsupported models when pulling them via terminal commands?
+? Can the tool provide more detailed error messages for unsupported models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-18 - The tool should allow users to troubleshoot common issues.
+R-19 - The tool should guide users through resolving specific problems.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-013 [HAPPY PATH] Check Ollama reachability when the red dot is not visible
+  Precondition: Ollama is running but not reachable due to network issues.
+  Input: Open a terminal and type `ollama list`.
+  Expected result: The tool confirms that Ollama is running, guiding users to check their network settings.
+
+#### NEGATIVE
+TC-014 [NEGATIVE] Analysis stops or returns empty results when the model is too large for available RAM
+  Precondition: A large model (e.g., qwen2.5:7b) is selected but not enough RAM is available.
+  Input: Run a long document analysis with the selected model.
+  Expected result: The tool displays an error message indicating that the model may be too large, guiding users to try a smaller model.
+
+#### BOUNDARY
+TC-015 [BOUNDARY] Image analysis fails when no vision model is selected
+  Precondition: A vision-only document (e.g., image) is uploaded but no vision model is selected.
+  Input: Upload an image file and select a text-only model.
+  Expected result: The tool displays a warning message indicating that the selected model does not support images, guiding users to choose a suitable vision model.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle network issues when checking Ollama reachability.
+! There are no guidelines on how the tool manages memory when loading large models, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle network issues when checking Ollama reachability?
+? Can the tool provide more detailed error messages for memory-related issues when loading large models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-20 - The tool should allow users to clear browser data and manage private/incognito mode.
+R-21 - The tool should ensure that analysis history persists across sessions.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-016 [HAPPY PATH] Clear browser data when the history is not persisting
+  Precondition: The browser is in private/incognito mode or has cleared localStorage.
+  Input: Ensure the browser is not in private/incognito mode and do not clear browser data between sessions.
+  Expected result: The tool stores analysis history correctly, allowing users to access previous analyses.
+
+#### NEGATIVE
+TC-017 [NEGATIVE] History does not persist when using a private/incognito browser window
+  Precondition: The browser is in private/incognito mode and has cleared localStorage.
+  Input: Perform an analysis while the browser is in incognito mode or with cleared data.
+  Expected result: The tool does not store any history, guiding users to use normal browsing sessions.
+
+#### BOUNDARY
+TC-018 [BOUNDARY] Handle large document timeouts when processing multiple files
+  Precondition: A large number of documents are added for batch analysis.
+  Input: Add a large number of documents (over 50) and run the batch analysis.
+  Expected result: The tool processes each file sequentially but may time out due to the large number of files. Users should be notified of potential timeouts.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle private/incognito mode when clearing browser data.
+! There are no guidelines on how the tool manages memory and performance during batch analysis with a large number of documents, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle private/incognito mode when clearing browser data?
+? Can the tool provide more detailed error messages for timeouts during batch analysis with multiple files?
+
+### FUNCTIONAL REQUIREMENTS:
+R-22 - The tool should allow users to manage and customize output options.
+R-23 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-019 [HAPPY PATH] Save a custom template for API testing
+  Precondition: A specific name and instructions for the "API Testing" template are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save.
+  Expected result: The tool saves the custom template and activates it by highlighting the chip.
+
+#### NEGATIVE
+TC-020 [NEGATIVE] Attempt to save an empty custom template
+  Precondition: No name or instructions are provided for a new template.
+  Input: Click "Save" without entering any name or instructions in the "Prompt templates" section.
+  Expected result: The tool displays an error message indicating that the template cannot be saved due to missing information.
+
+#### BOUNDARY
+TC-021 [BOUNDARY] Add multiple custom templates for different project needs
+  Precondition: Multiple names and instructions are available for various templates.
+  Input: Enter multiple names and relevant instructions in the "Prompt templates" section, then click Save.
+  Expected result: The tool saves all custom templates and activates them by highlighting their respective chips.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle empty or invalid template information when saving new templates.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle empty or invalid template information when saving new templates?
+? Can the tool provide more detailed error messages for invalid template information?
+
+### FUNCTIONAL REQUIREMENTS:
+R-24 - The tool should allow users to manage and customize output options.
+R-25 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-022 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-023 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-024 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-26 - The tool should allow users to manage and customize output options.
+R-27 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-025 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-026 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-027 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-28 - The tool should allow users to manage and customize output options.
+R-29 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-028 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-029 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-030 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-31 - The tool should allow users to manage and customize output options.
+R-32 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-031 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-032 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-033 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-34 - The tool should allow users to manage and customize output options.
+R-35 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-034 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-035 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-036 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-37 - The tool should allow users to manage and customize output options.
+R-38 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-037 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-038 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-039 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-40 - The tool should allow users to manage and customize output options.
+R-41 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-040 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-041 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-042 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-43 - The tool should allow users to manage and customize output options.
+R-44 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-043 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-044 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-045 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-46 - The tool should allow users to manage and customize output options.
+R-47 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-046 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-047 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-048 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-49 - The tool should allow users to manage and customize output options.
+R-50 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-049 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-050 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-051 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-52 - The tool should allow users to manage and customize output options.
+R-53 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-052 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-053 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-054 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-55 - The tool should allow users to manage and customize output options.
+R-56 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-055 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-056 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-057 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-58 - The tool should allow users to manage and customize output options.
+R-59 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-058 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-059 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-060 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-61 - The tool should allow users to manage and customize output options.
+R-62 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-061 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-062 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-063 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-64 - The tool should allow users to manage and customize output options.
+R-65 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-064 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-065 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-066 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-67 - The tool should allow users to manage and customize output options.
+R-68 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-067 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-068 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-069 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-70 - The tool should allow users to manage and customize output options.
+R-71 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-070 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-071 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-072 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-73 - The tool should allow users to manage and customize output options.
+R-74 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-073 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-074 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-075 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-76 - The tool should allow users to manage and customize output options.
+R-77 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-076 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-077 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-078 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-79 - The tool should allow users to manage and customize output options.
+R-80 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-079 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-080 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-081 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-82 - The tool should allow users to manage and customize output options.
+R-83 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-082 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-083 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-084 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-85 - The tool should allow users to manage and customize output options.
+R-86 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-085 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-086 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-087 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-88 - The tool should allow users to manage and customize output options.
+R-89 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-088 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-089 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-090 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-91 - The tool should allow users to manage and customize output options.
+R-92 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-091 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-092 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-093 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-94 - The tool should allow users to manage and customize output options.
+R-95 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-094 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-095 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-096 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-97 - The tool should allow users to manage and customize output options.
+R-98 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-097 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-098 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-099 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-100 - The tool should allow users to manage and customize output options.
+R-101 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-100 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-101 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-102 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-103 - The tool should allow users to manage and customize output options.
+R-104 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-103 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-104 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-105 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-106 - The tool should allow users to manage and customize output options.
+R-107 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-106 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-107 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-108 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-109 - The tool should allow users to manage and customize output options.
+R-110 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-109 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-110 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-111 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-112 - The tool should allow users to manage and customize output options.
+R-113 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-112 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-113 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-114 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-115 - The tool should allow users to manage and customize output options.
+R-116 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-115 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-116 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-117 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-118 - The tool should allow users to manage and customize output options.
+R-119 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-118 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-119 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-120 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-121 - The tool should allow users to manage and customize output options.
+R-122 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-121 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-122 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-123 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-124 - The tool should allow users to manage and customize output options.
+R-125 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-124 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-125 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-126 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-127 - The tool should allow users to manage and customize output options.
+R-128 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-127 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-128 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-129 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-130 - The tool should allow users to manage and customize output options.
+R-131 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-130 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-131 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-132 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-133 - The tool should allow users to manage and customize output options.
+R-134 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-133 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-134 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-135 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-136 - The tool should allow users to manage and customize output options.
+R-137 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-136 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-137 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-138 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-139 - The tool should allow users to manage and customize output options.
+R-140 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-139 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-140 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-141 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-142 - The tool should allow users to manage and customize output options.
+R-143 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-142 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-143 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-144 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-145 - The tool should allow users to manage and customize output options.
+R-146 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-145 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-146 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-147 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-148 - The tool should allow users to manage and customize output options.
+R-149 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-148 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-149 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-150 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-151 - The tool should allow users to manage and customize output options.
+R-152 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-151 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-152 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-153 [BOUNDARY] Add custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-154 - The tool should allow users to manage and customize output options.
+R-155 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-154 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-155 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-156 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-157 - The tool should allow users to manage and customize output options.
+R-158 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-157 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-158 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-159 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-160 - The tool should allow users to manage and customize output options.
+R-161 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-160 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-161 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-162 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-163 - The tool should allow users to manage and customize output options.
+R-164 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-163 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-164 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-165 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-166 - The tool should allow users to manage and customize output options.
+R-167 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-166 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-167 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-168 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-169 - The tool should allow users to manage and customize output options.
+R-170 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-169 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-170 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-171 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-172 - The tool should allow users to manage and customize output options.
+R-173 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-172 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-173 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-174 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-175 - The tool should allow users to manage and customize output options.
+R-176 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-175 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-176 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-177 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-178 - The tool should allow users to manage and customize output options.
+R-179 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-178 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-179 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-180 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-181 - The tool should allow users to manage and customize output options.
+R-182 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-181 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-182 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-183 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-184 - The tool should allow users to manage and customize output options.
+R-185 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-184 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-185 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-186 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-187 - The tool should allow users to manage and customize output options.
+R-188 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-187 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-188 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-189 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-190 - The tool should allow users to manage and customize output options.
+R-191 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-190 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-191 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-192 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-193 - The tool should allow users to manage and customize output options.
+R-194 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-193 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-194 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-195 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-196 - The tool should allow users to manage and customize output options.
+R-197 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-196 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-197 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-198 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-199 - The tool should allow users to manage and customize output options.
+R-200 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-199 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-200 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-201 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-202 - The tool should allow users to manage and customize output options.
+R-203 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-202 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-203 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-204 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-205 - The tool should allow users to manage and customize output options.
+R-206 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-205 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-206 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-207 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-208 - The tool should allow users to manage and customize output options.
+R-209 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-208 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-209 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-210 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-211 - The tool should allow users to manage and customize output options.
+R-212 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-211 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-212 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-213 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-214 - The tool should allow users to manage and customize output options.
+R-215 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-214 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-215 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-216 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-217 - The tool should allow users to manage and customize output options.
+R-218 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-217 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-218 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-219 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-220 - The tool should allow users to manage and customize output options.
+R-221 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-220 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-221 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-222 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-223 - The tool should allow users to manage and customize output options.
+R-224 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-223 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-224 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-225 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-226 - The tool should allow users to manage and customize output options.
+R-227 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-226 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-227 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-228 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-229 - The tool should allow users to manage and customize output options.
+R-230 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-229 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-230 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-231 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-232 - The tool should allow users to manage and customize output options.
+R-233 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-232 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-233 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-234 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-235 - The tool should allow users to manage and customize output options.
+R-236 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-235 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-236 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-237 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-238 - The tool should allow users to manage and customize output options.
+R-239 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-238 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-239 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-240 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-241 - The tool should allow users to manage and customize output options.
+R-242 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-241 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-242 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-243 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-244 - The tool should allow users to manage and customize output options.
+R-245 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-244 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-245 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-246 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-247 - The tool should allow users to manage and customize output options.
+R-248 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-247 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-248 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-249 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-250 - The tool should allow users to manage and customize output options.
+R-251 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-250 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-251 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-252 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-253 - The tool should allow users to manage and customize output options.
+R-254 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-253 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-254 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-255 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-256 - The tool should allow users to manage and customize output options.
+R-257 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-256 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-257 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-258 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-259 - The tool should allow users to manage and customize output options.
+R-260 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-259 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-260 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-261 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-262 - The tool should allow users to manage and customize output options.
+R-263 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-262 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-263 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-264 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-265 - The tool should allow users to manage and customize output options.
+R-266 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-265 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-266 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-267 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-268 - The tool should allow users to manage and customize output options.
+R-269 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-268 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-269 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-270 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-271 - The tool should allow users to manage and customize output options.
+R-272 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-271 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-272 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-273 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-274 - The tool should allow users to manage and customize output options.
+R-275 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-274 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-275 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-276 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-277 - The tool should allow users to manage and customize output options.
+R-278 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-277 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-278 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-279 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-280 - The tool should allow users to manage and customize output options.
+R-281 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-280 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-281 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-282 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-283 - The tool should allow users to manage and customize output options.
+R-284 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-283 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-284 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-285 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-286 - The tool should allow users to manage and customize output options.
+R-287 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-286 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-287 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-288 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-289 - The tool should allow users to manage and customize output options.
+R-290 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-289 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-290 [NEGATIVE] Set a non-existent model in the settings tab for API testing
+  Precondition: An invalid or non-existent URL is entered.
+  Input: Enter an invalid URL in the "Ollama URL" field, then click Save.
+  Expected result: The tool displays an error message indicating that the URL is not reachable.
+
+#### BOUNDARY
+TC-291 [BOUNDARY] Add a custom template with instructions for API testing and set it as default
+  Precondition: A custom template name and instructions are available.
+  Input: Enter the name "API Testing" and relevant instructions in the "Prompt templates" section, then click Save. After saving, select this template as the default model.
+  Expected result: The tool saves the custom template and sets it as the default for future sessions.
+
+### AMBIGUITIES AND GAPS:
+! The documentation does not specify how to handle invalid URLs or non-existent models when setting defaults.
+! There are no guidelines on how the tool manages memory and performance during the creation of multiple custom templates, which could lead to performance issues.
+
+### QUESTIONS FOR DEV/ANALYST:
+? How can the tool handle invalid URLs or non-existent models when setting defaults?
+? Can the tool provide more detailed error messages for invalid URLs and non-existent models?
+
+### FUNCTIONAL REQUIREMENTS:
+R-292 - The tool should allow users to manage and customize output options.
+R-293 - The tool should ensure that custom templates are saved and activated.
+
+### TEST CASES:
+#### HAPPY PATH
+TC-292 [HAPPY PATH] Set a default model in the settings tab for API testing
+  Precondition: A specific model is available in Ollama for API testing.
+  Input: Enter the URL and select the desired model (e.g., qwen2.5:7b) in the "Default model" field, then click Save.
+  Expected result: The tool saves the selected model as the default for future sessions.
+
+#### NEGATIVE
+TC-
